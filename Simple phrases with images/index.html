@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phrase Practice (Kids)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 26px;
+            margin-bottom: 10px;
+        }
+        
+        .intro {
+            font-size: 15px;
+            opacity: 0.9;
+            line-height: 1.5;
+            margin-top: 10px;
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .content {
+            padding: 25px;
+        }
+        
+        .sentence-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 6px solid #3498db;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .sentence-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        /* BIGGER IMAGE CONTAINER */
+        .image-container {
+            width: 280px;
+            height: 280px;
+            margin-bottom: 20px;
+            background-color: white;
+            border-radius: 15px;
+            border: 3px solid #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        
+        .vocab-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .portuguese {
+            color: #444;
+            font-size: 20px;
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+        
+        .english {
+            color: #111;
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+        
+        .transliteration {
+            color: #7f8c8d;
+            font-style: italic;
+            font-size: 18px;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .play-btn { background: #2ecc71; color: white; }
+        .slow-btn { background: #f39c12; color: white; }
+        .record-btn { background: #e74c3c; color: white; }
+        .reset-btn { background: #95a5a6; color: white; }
+
+        .record-btn.recording {
+            background: #c0392b;
+            animation: pulse 1.5s infinite;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .progress-container {
+            margin-top: 25px;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 350px;
+        }
+        
+        .progress-steps {
+            display: flex;
+            gap: 8px;
+            height: 10px;
+        }
+        
+        .step {
+            flex: 1;
+            background: #ecf0f1;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .step.completed {
+            background: #2ecc71;
+        }
+        
+        .feedback {
+            margin-top: 15px;
+            font-size: 18px;
+            min-height: 24px;
+            font-weight: 500;
+        }
+        
+        .feedback.success { color: #27ae60; }
+        .feedback.error { color: #e67e22; }
+        .feedback.listening { color: #e74c3c; font-style: italic; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+
+        /* Footer Attribution */
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 400px;
+            text-align: center;
+        }
+        .close-btn {
+            margin-top: 20px;
+            background: #3498db;
+            color: white;
+            width: 100%;
+            justify-content: center;
+            padding: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .controls { justify-content: center; }
+            button { font-size: 14px; padding: 10px 14px; }
+            .english { font-size: 20px; }
+            .image-container { width: 200px; height: 200px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🖼️ Phrase Practice</h1>
+        <div class="intro">
+          Acesse o link pelo navegador Chrome. Clique em (▶️ Play</button>) para ouvir, em (🐢 Slow</button>) para ouvir mais lentamente e em (🔴 Record</button>) para treinar a sua pronúncia. Repita cada item com no mínimo 60% da pronúncia correta, por quatro vezes. A identificação de voz tem cerca de 90% de precisão e o programa pode apresentar bugs.
+        </div>
+    </header>
+    
+    <div class="content" id="cards-container">
+        </div>
+</div>
+
+<footer>
+    Created by Jonas Goes
+</footer>
+
+<div id="error-modal" class="modal">
+    <div class="modal-content">
+        <h3>🎤 Microphone Access</h3>
+        <p style="margin-top:10px; color:#666;">It seems your browser doesn't support direct recording or permission was denied. You can still use the playback features!</p>
+        <button class="close-btn" onclick="closeModal()">Okay</button>
+    </div>
+</div>
+
+<script>
+    // 10151401190618050920011907150519
+    const sentences = [
+        { img: "two gray chickens.png", emoji: "🐔", en: "Two gray chickens", pt: "Duas galinhas cinzas", trans: "Tchu grhêi tchí kens" },
+        { img: "two blue giraffes.png", emoji: "🦒", en: "Two blue giraffes", pt: "Duas girafas azuis", trans: "Tchu blú dji rhéfs" },
+        { img: "two black tigers.png", emoji: "🐅", en: "Two black tigers", pt: "Dois tigres pretos", trans: "Tchu bléc tái gerhz" },
+        { img: "three blue elephants.png", emoji: "🐘", en: "Three blue elephants", pt: "Três elefantes azuis", trans: "Thrhí blú é le fants" },
+        { img: "three yellow helicopters.png", emoji: "🚁", en: "Three yellow helicopters", pt: "Três helicópteros amarelos", trans: "Thrhí ié lou rhé li cóp terhz" },
+        { img: "three orange zebras.png", emoji: "🦓", en: "Three orange zebras", pt: "Três zebras laranjas", trans: "Thrhí ó rhindj zí brhaz" },
+        { img: "ten white buses.png", emoji: "🚌", en: "Ten white buses", pt: "Dez ônibus brancos", trans: "Tén uáit bâ sêz" },
+        { img: "ten blue cats.png", emoji: "🐱", en: "Ten blue cats", pt: "Dez gatos azuis", trans: "Tén blú kéts" },
+        { img: "six yellow bikes.png", emoji: "🚲", en: "Six yellow bikes", pt: "Seis bicicletas amarelas", trans: "Sícs ié lou báics" },
+        { img: "six red elephants.png", emoji: "🐘", en: "Six red elephants", pt: "Seis elefantes vermelhos", trans: "Sícs rhéd é le fants" },
+        { img: "six pink lions.png", emoji: "🦁", en: "Six pink lions", pt: "Seis leões rosas", trans: "Sícs pinc lái ons" },
+        { img: "six black cars.png", emoji: "🚗", en: "Six black cars", pt: "Seis carros pretos", trans: "Sícs bléc cárhz" },
+        { img: "seven blue dogs.png", emoji: "🐶", en: "Seven blue dogs", pt: "Sete cachorros azuis", trans: "Sé ven blú dógs" },
+        { img: "one purple boat.png", emoji: "⛵", en: "One purple boat", pt: "Um barco roxo", trans: "Uán pâr pôul bôut" },
+        { img: "one green train.png", emoji: "🚂", en: "One green train", pt: "Um trem verde", trans: "Uán grhín trhêin" },
+        { img: "nine green dogs.png", emoji: "🐶", en: "Nine green dogs", pt: "Nove cachorros verdes", trans: "Náin grhín dógs" },
+        { img: "five orange foxes.png", emoji: "🦊", en: "Five orange foxes", pt: "Cinco raposas laranjas", trans: "Fáiv ó rhindj fóc sêz" },
+        { img: "five white chairs.png", emoji: "🪑", en: "Five white chairs", pt: "Cinco cadeiras brancas", trans: "Fáiv uáit tché rhz" },
+        { img: "two blue pencils.png", emoji: "✏️", en: "Two blue pencils", pt: "Dois lápis azuis", trans: "Tchu blú pén ciols" },
+        { img: "one red book.png", emoji: "📕", en: "One red book", pt: "Um livro vermelho", trans: "Uán rhéd búc" },
+        { img: "five orange pens.png", emoji: "🖊️", en: "Five orange pens", pt: "Cinco canetas laranjas", trans: "Fáiv ó rhindj péns" },
+        { img: "four red balloons.png", emoji: "🎈", en: "Four red balloons", pt: "Quatro balões vermelhos", trans: "Fórh rhéd ba lúns" },
+        { img: "two blue cows.png", emoji: "🐮", en: "Two blue cows", pt: "Duas vacas azuis", trans: "Tchu blú cáus" },
+        { img: "five white rabbits.png", emoji: "🐰", en: "Five white rabbits", pt: "Cinco coelhos brancos", trans: "Fáiv uáit rhé bits" },
+        { img: "five black cats.png", emoji: "🐱", en: "Five black cats", pt: "Cinco gatos pretos", trans: "Fáiv bléc kéts" },
+        { img: "two blue birds.png", emoji: "🐦", en: "Two blue birds", pt: "Dois pássaros azuis", trans: "Tchu blú bârhdz" },
+        { img: "seven green frogs.png", emoji: "🐸", en: "Seven green frogs", pt: "Sete sapos verdes", trans: "Sé ven grhín frhógs" },
+        { img: "three pink pigs.png", emoji: "🐷", en: "Three pink pigs", pt: "Três porcos rosas", trans: "Thrhí pinc pigs" },
+        { img: "four yellow balls.png", emoji: "⚽", en: "Four yellow balls", pt: "Quatro bolas amarelas", trans: "Fórh ié lou bóls" },
+        { img: "four yellow elephants.png", emoji: "🐘", en: "Four yellow elephants", pt: "Quatro elefantes amarelos", trans: "Fórh ié lou é le fants" },
+        { img: "four white horses.png", emoji: "🐴", en: "Four white horses", pt: "Quatro cavalos brancos", trans: "Fórh uáit rórh sêz" },
+        { img: "four green buses.png", emoji: "🚌", en: "Four green buses", pt: "Quatro ônibus verdes", trans: "Fórh grhín bâ sêz" },
+        { img: "five red trains.png", emoji: "🚂", en: "Five red trains", pt: "Cinco trens vermelhos", trans: "Fáiv rhéd trhêins" },
+        { img: "five green bikes.png", emoji: "🚲", en: "Five green bikes", pt: "Cinco bicicletas verdes", trans: "Fáiv grhín báics" },
+        { img: "eight yellow boats.png", emoji: "⛵", en: "Eight yellow boats", pt: "Oito barcos amarelos", trans: "Êit iélou bôuts" }
+    ];
+
+    const STORAGE_KEY = 'phrase_png_correct_kids_v1';
+    let recognition;
+    let currentRecIndex = -1;
+    let progressData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+
+    function init() {
+        const container = document.getElementById('cards-container');
+        
+        sentences.forEach((item, index) => {
+            if (!progressData[index]) progressData[index] = 0;
+
+            const card = document.createElement('div');
+            card.className = 'sentence-card';
+            
+            card.innerHTML = `
+                <div class="image-container">
+                    <img src="${item.img}" 
+                         alt="${item.en}" 
+                         class="vocab-image" 
+                         onerror="this.style.display='none'; this.parentNode.innerHTML='<div style=\'font-size:80px\'>${item.emoji}</div>'">
+                </div>
+                <div class="portuguese">🇧🇷 ${item.pt}</div>
+                <div class="english">🇺🇸 ${item.en}</div>
+                <div class="transliteration">🔤 ${item.trans}</div>
+                
+                <div class="controls">
+                    <button class="play-btn" onclick="speak('${item.en.replace(/'/g, "\\'")}', 1)">▶️ Play</button>
+                    <button class="slow-btn" onclick="speak('${item.en.replace(/'/g, "\\'")}', 0.75)">🐢 Slow</button>
+                    <button class="record-btn" id="rec-${index}" onclick="toggleRecord(${index})">🔴 Record</button>
+                    <button class="reset-btn" onclick="resetProgress(${index})">🔁</button>
+                </div>
+                
+                <div class="feedback" id="feedback-${index}"></div>
+
+                <div class="progress-container">
+                    <div class="progress-steps" id="prog-${index}">
+                        ${renderProgressBar(progressData[index])}
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+        // Initialize Speech API
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+
+            recognition.onstart = () => {
+                document.getElementById(`feedback-${currentRecIndex}`).className = "feedback listening";
+                document.getElementById(`feedback-${currentRecIndex}`).innerText = "Listening...";
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                handleResult(transcript);
+            };
+
+            recognition.onerror = (event) => {
+                stopRecordingUI();
+                const fb = document.getElementById(`feedback-${currentRecIndex}`);
+                if(fb) {
+                    fb.innerText = "Error: Could not hear you clearly.";
+                    fb.className = "feedback error";
+                }
+            };
+            
+            recognition.onend = () => stopRecordingUI();
+        }
+    }
+
+    function toggleRecord(index) {
+        if (!recognition) {
+            document.getElementById('error-modal').style.display = 'flex';
+            return;
+        }
+
+        window.speechSynthesis.cancel();
+
+        if (currentRecIndex === index) {
+            recognition.stop();
+            return;
+        }
+        currentRecIndex = index;
+        updateRecordBtnUI(index, true);
+        recognition.start();
+    }
+
+    function handleResult(spokenText) {
+        const targetText = sentences[currentRecIndex].en;
+        const feedbackEl = document.getElementById(`feedback-${currentRecIndex}`);
+        
+        const cleanSpoken = spokenText.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+        const cleanTarget = targetText.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+        
+        const similarity = calculateSimilarity(cleanSpoken, cleanTarget);
+
+        if (similarity > 0.6) {
+            progressData[currentRecIndex] = Math.min(progressData[currentRecIndex] + 1, 4);
+            saveProgress();
+            updateProgressBarUI(currentRecIndex);
+            feedbackEl.innerText = `✅ "${spokenText}" - Good job!`;
+            feedbackEl.className = "feedback success";
+        } else {
+            feedbackEl.innerText = `❌ "${spokenText}" - Try again!`;
+            feedbackEl.className = "feedback error";
+        }
+    }
+
+    function calculateSimilarity(s1, s2) {
+        let longer = s1;
+        let shorter = s2;
+        if (s1.length < s2.length) { longer = s2; shorter = s1; }
+        let longerLength = longer.length;
+        if (longerLength == 0) { return 1.0; }
+        return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+    }
+    
+    function editDistance(s1, s2) {
+        s1 = s1.toLowerCase(); s2 = s2.toLowerCase();
+        let costs = new Array();
+        for (let i = 0; i <= s1.length; i++) {
+            let lastValue = i;
+            for (let j = 0; j <= s2.length; j++) {
+                if (i == 0) costs[j] = j;
+                else {
+                    if (j > 0) {
+                        let newValue = costs[j - 1];
+                        if (s1.charAt(i - 1) != s2.charAt(j - 1)) newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                        costs[j - 1] = lastValue;
+                        lastValue = newValue;
+                    }
+                }
+            }
+            if (i > 0) costs[s2.length] = lastValue;
+        }
+        return costs[s2.length];
+    }
+
+    function speak(text, rate) {
+        if (recognition && currentRecIndex !== -1) {
+            recognition.abort();
+            stopRecordingUI();
+        }
+
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = rate;
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function updateRecordBtnUI(index, isRecording) {
+        document.querySelectorAll('.record-btn').forEach(btn => {
+            btn.classList.remove('recording');
+            btn.innerHTML = '🔴 Record';
+        });
+        if (isRecording) {
+            const btn = document.getElementById(`rec-${index}`);
+            btn.classList.add('recording');
+            btn.innerHTML = '⏹ Stop';
+        }
+    }
+
+    function stopRecordingUI() {
+        updateRecordBtnUI(-1, false);
+        currentRecIndex = -1;
+    }
+
+    function renderProgressBar(level) {
+        let html = '';
+        for (let i = 0; i < 4; i++) {
+            html += `<div class="step ${i < level ? 'completed' : ''}"></div>`;
+        }
+        return html;
+    }
+
+    function updateProgressBarUI(index) {
+        document.getElementById(`prog-${index}`).innerHTML = renderProgressBar(progressData[index]);
+    }
+
+    function resetProgress(index) {
+        progressData[index] = 0;
+        saveProgress();
+        updateProgressBarUI(index);
+        document.getElementById(`feedback-${index}`).innerText = "";
+    }
+
+    function saveProgress() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(progressData));
+    }
+
+    function closeModal() {
+        document.getElementById('error-modal').style.display = 'none';
+    }
+
+    window.onload = init;
+</script>
+
+</body>
+</html>
