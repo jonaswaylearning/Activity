@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cobra Kai S01E02 - Interactive Practice</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 26px;
+            margin-bottom: 10px;
+        }
+        
+        .intro {
+            font-size: 15px;
+            opacity: 0.9;
+            line-height: 1.5;
+            margin-top: 10px;
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .content {
+            padding: 25px;
+        }
+        
+        .sentence-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #3498db;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+        
+        .sentence-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .timestamp {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .portuguese {
+            color: #444;
+            font-size: 18px;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        
+        .english {
+            color: #111;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        
+        .transliteration {
+            color: #7f8c8d;
+            font-style: italic;
+            font-size: 16px;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .play-btn { background: #2ecc71; color: white; }
+        .slow-btn { background: #f39c12; color: white; }
+        .record-btn { background: #e74c3c; color: white; }
+        .reset-btn { background: #95a5a6; color: white; margin-left: auto; }
+
+        .record-btn.recording {
+            background: #c0392b;
+            animation: pulse 1.5s infinite;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .progress-container {
+            margin-top: 15px;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .progress-steps {
+            display: flex;
+            gap: 6px;
+            height: 8px;
+        }
+        
+        .step {
+            flex: 1;
+            background: #ecf0f1;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        
+        .step.completed {
+            background: #2ecc71;
+        }
+        
+        .feedback {
+            margin-top: 10px;
+            font-size: 14px;
+            min-height: 20px;
+            font-weight: 500;
+        }
+        
+        .feedback.success { color: #27ae60; }
+        .feedback.error { color: #e67e22; }
+        .feedback.listening { color: #e74c3c; font-style: italic; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 400px;
+            text-align: center;
+        }
+        .close-btn {
+            margin-top: 20px;
+            background: #3498db;
+            color: white;
+            width: 100%;
+            justify-content: center;
+        }
+
+        @media (max-width: 600px) {
+            .controls { justify-content: space-between; }
+            button { flex: 1; justify-content: center; font-size: 13px; padding: 10px; }
+            .english { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🎬 Cobra Kai S01E02</h1>
+        <div class="intro">
+            Click ▶️ to hear the original line, 🐢 to hear it slower, and 🔴 to record your pronunciation.
+        </div>
+    </header>
+    
+    <div class="content" id="cards-container">
+        </div>
+</div>
+
+<div id="error-modal" class="modal">
+    <div class="modal-content">
+        <h3>🎤 Microphone Access</h3>
+        <p style="margin-top:10px; color:#666;">It seems your browser doesn't support direct recording or permission was denied. You can still use the playback features!</p>
+        <button class="close-btn" onclick="closeModal()">Okay</button>
+    </div>
+</div>
+
+<script>
+    const sentences = [
+        {
+            time: "03:06",
+            en: "Striking first is the initial step towards victory.",
+            pt: "Acertar primeiro é o passo inicial para a vitória.",
+            trans: "Strháiking fârhst iz the iníshal stép tuwórhds víctorhy."
+        },
+        {
+            time: "04:58",
+            en: "So, I have to do all this crap before I even open?",
+            pt: "Então, tenho que fazer essa porcaria antes de abrir?",
+            trans: "Sôu ái rév tchu du ól this crép bifórh ái íven ôupen?"
+        },
+        {
+            time: "08:06",
+            en: "Do not question my methods.",
+            pt: "Não questione meus métodos.",
+            trans: "Du nót quéstchen mái méthods."
+        },
+        {
+            time: "11:12",
+            en: "Believe me, girls can be really cruel.",
+            pt: "Acredite em mim, meninas podem ser bem cruéis.",
+            trans: "Bilív mi, gârhls kén bi rhíli crhúel."
+        },
+        {
+            time: "14:48",
+            en: "You don't have to worry about me, Dad. I can handle myself.",
+            pt: "Não precisa se preocupar comigo, pai. Eu sei me cuidar.",
+            trans: "Iuron rév tchu uórhi abáut mai Déd. Ái kén rendol máisélf."
+        },
+        {
+            time: "16:28",
+            en: "Just because they're hot doesn't mean they're mean.",
+            pt: "Só porque são gatas não significa que sejam más.",
+            trans: "Djâst bikóz théirh rát dâzent mín théirh mín."
+        },
+        {
+            time: "24:40",
+            en: "Maybe you don't know your daughter as well as you think you do.",
+            pt: "Talvez você não conheça sua filha tão bem assim.",
+            trans: "Mêibi iurôunôu iórh dórerh éz uél éz iu think iu du."
+        }
+    ];
+
+    const STORAGE_KEY = 'cobra_kai_s01e02_v1';
+    let recognition;
+    let currentRecIndex = -1;
+    let progressData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+
+    function init() {
+        const container = document.getElementById('cards-container');
+        
+        sentences.forEach((item, index) => {
+            if (!progressData[index]) progressData[index] = 0;
+
+            const card = document.createElement('div');
+            card.className = 'sentence-card';
+            card.innerHTML = `
+                <div class="timestamp">${item.time}</div>
+                <div class="portuguese">🇧🇷 ${item.pt}</div>
+                <div class="english">🇺🇸 ${item.en}</div>
+                <div class="transliteration">🔤 ${item.trans}</div>
+                
+                <div class="controls">
+                    <button class="play-btn" onclick="speak('${item.en.replace(/'/g, "\\'")}', 1)">▶️ Play</button>
+                    <button class="slow-btn" onclick="speak('${item.en.replace(/'/g, "\\'")}', 0.75)">🐢 Slow</button>
+                    <button class="record-btn" id="rec-${index}" onclick="toggleRecord(${index})">🔴 Record</button>
+                    <button class="reset-btn" onclick="resetProgress(${index})">🔁</button>
+                </div>
+                
+                <div class="feedback" id="feedback-${index}"></div>
+
+                <div class="progress-container">
+                    <div class="progress-steps" id="prog-${index}">
+                        ${renderProgressBar(progressData[index])}
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+        // Initialize Speech API
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+
+            recognition.onstart = () => {
+                document.getElementById(`feedback-${currentRecIndex}`).className = "feedback listening";
+                document.getElementById(`feedback-${currentRecIndex}`).innerText = "Listening...";
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                handleResult(transcript);
+            };
+
+            recognition.onerror = (event) => {
+                stopRecordingUI();
+                const fb = document.getElementById(`feedback-${currentRecIndex}`);
+                if(fb) {
+                    fb.innerText = "Error: Could not hear you clearly.";
+                    fb.className = "feedback error";
+                }
+            };
+            
+            recognition.onend = () => stopRecordingUI();
+        }
+    }
+
+    function toggleRecord(index) {
+        if (!recognition) {
+            document.getElementById('error-modal').style.display = 'flex';
+            return;
+        }
+        if (currentRecIndex === index) {
+            recognition.stop();
+            return;
+        }
+        currentRecIndex = index;
+        updateRecordBtnUI(index, true);
+        recognition.start();
+    }
+
+    function handleResult(spokenText) {
+        const targetText = sentences[currentRecIndex].en;
+        const feedbackEl = document.getElementById(`feedback-${currentRecIndex}`);
+        
+        const cleanSpoken = spokenText.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+        const cleanTarget = targetText.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+        
+        if (cleanTarget.includes(cleanSpoken) || cleanSpoken.includes(cleanTarget) || calculateSimilarity(cleanSpoken, cleanTarget) > 0.7) {
+            progressData[currentRecIndex] = Math.min(progressData[currentRecIndex] + 1, 4);
+            saveProgress();
+            updateProgressBarUI(currentRecIndex);
+            feedbackEl.innerText = `✅ "${spokenText}" - Good job!`;
+            feedbackEl.className = "feedback success";
+        } else {
+            feedbackEl.innerText = `❌ "${spokenText}" - Try again!`;
+            feedbackEl.className = "feedback error";
+        }
+    }
+
+    function calculateSimilarity(s1, s2) {
+        let longer = s1;
+        let shorter = s2;
+        if (s1.length < s2.length) { longer = s2; shorter = s1; }
+        let longerLength = longer.length;
+        if (longerLength == 0) { return 1.0; }
+        return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+    }
+    
+    function editDistance(s1, s2) {
+        s1 = s1.toLowerCase(); s2 = s2.toLowerCase();
+        let costs = new Array();
+        for (let i = 0; i <= s1.length; i++) {
+            let lastValue = i;
+            for (let j = 0; j <= s2.length; j++) {
+                if (i == 0) costs[j] = j;
+                else {
+                    if (j > 0) {
+                        let newValue = costs[j - 1];
+                        if (s1.charAt(i - 1) != s2.charAt(j - 1)) newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                        costs[j - 1] = lastValue;
+                        lastValue = newValue;
+                    }
+                }
+            }
+            if (i > 0) costs[s2.length] = lastValue;
+        }
+        return costs[s2.length];
+    }
+
+    function speak(text, rate) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = rate;
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function updateRecordBtnUI(index, isRecording) {
+        document.querySelectorAll('.record-btn').forEach(btn => {
+            btn.classList.remove('recording');
+            btn.innerHTML = '🔴 Record';
+        });
+        if (isRecording) {
+            const btn = document.getElementById(`rec-${index}`);
+            btn.classList.add('recording');
+            btn.innerHTML = '⏹ Stop';
+        }
+    }
+
+    function stopRecordingUI() {
+        updateRecordBtnUI(-1, false);
+        currentRecIndex = -1;
+    }
+
+    function renderProgressBar(level) {
+        let html = '';
+        for (let i = 0; i < 4; i++) {
+            html += `<div class="step ${i < level ? 'completed' : ''}"></div>`;
+        }
+        return html;
+    }
+
+    function updateProgressBarUI(index) {
+        document.getElementById(`prog-${index}`).innerHTML = renderProgressBar(progressData[index]);
+    }
+
+    function resetProgress(index) {
+        progressData[index] = 0;
+        saveProgress();
+        updateProgressBarUI(index);
+        document.getElementById(`feedback-${index}`).innerText = "";
+    }
+
+    function saveProgress() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(progressData));
+    }
+
+    function closeModal() {
+        document.getElementById('error-modal').style.display = 'none';
+    }
+
+    window.onload = init;
+</script>
+
+</body>
+</html>
