@@ -17,6 +17,8 @@
             min-height: 100vh;
             padding: 20px;
             color: #333;
+            display: flex;
+            flex-direction: column;
         }
         
         .container {
@@ -26,6 +28,7 @@
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            width: 100%;
         }
         
         header {
@@ -56,12 +59,16 @@
         
         .sentence-card {
             background: #f8f9fa;
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 20px;
-            margin-bottom: 20px;
-            border-left: 5px solid #3498db;
+            margin-bottom: 25px;
+            border-left: 6px solid #3498db;
             transition: transform 0.3s, box-shadow 0.3s;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
         }
         
         .sentence-card:hover {
@@ -89,7 +96,7 @@
         
         .english {
             color: #111;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
             margin-bottom: 8px;
             line-height: 1.4;
@@ -105,13 +112,15 @@
         
         .controls {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-top: 10px;
             flex-wrap: wrap;
+            justify-content: flex-start;
+            width: 100%;
         }
         
         button {
-            padding: 10px 16px;
+            padding: 10px 20px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
@@ -120,7 +129,7 @@
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
@@ -144,10 +153,11 @@
         }
         
         .progress-container {
-            margin-top: 15px;
+            margin-top: 20px;
             background: white;
-            padding: 10px;
+            padding: 8px;
             border-radius: 8px;
+            width: 100%;
         }
         
         .progress-steps {
@@ -168,9 +178,9 @@
         }
         
         .feedback {
-            margin-top: 10px;
-            font-size: 14px;
-            min-height: 20px;
+            margin-top: 15px;
+            font-size: 15px;
+            min-height: 24px;
             font-weight: 500;
         }
         
@@ -182,6 +192,16 @@
             0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
             70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
             100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+
+        /* Footer Attribution */
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+            font-weight: 500;
         }
 
         /* Modal */
@@ -207,12 +227,14 @@
             color: white;
             width: 100%;
             justify-content: center;
+            padding: 12px;
         }
 
         @media (max-width: 600px) {
             .controls { justify-content: space-between; }
-            button { flex: 1; justify-content: center; font-size: 13px; padding: 10px; }
-            .english { font-size: 18px; }
+            button { flex: 1; justify-content: center; font-size: 13px; padding: 10px 5px; }
+            .english { font-size: 19px; }
+            .reset-btn { margin-left: 0; flex: 0 0 auto; }
         }
     </style>
 </head>
@@ -230,6 +252,10 @@
         </div>
 </div>
 
+<footer>
+    Created by Jonas Freitas Goes
+</footer>
+
 <div id="error-modal" class="modal">
     <div class="modal-content">
         <h3>🎤 Microphone Access</h3>
@@ -239,6 +265,7 @@
 </div>
 
 <script>
+    // 10151401190618050920011907150519
     const sentences = [
         {
             time: "03:06",
@@ -284,7 +311,7 @@
         }
     ];
 
-    const STORAGE_KEY = 'cobra_kai_s01e02_v1';
+    const STORAGE_KEY = 'cobra_kai_s01e02_fixed_v2';
     let recognition;
     let currentRecIndex = -1;
     let progressData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
@@ -297,6 +324,7 @@
 
             const card = document.createElement('div');
             card.className = 'sentence-card';
+            
             card.innerHTML = `
                 <div class="timestamp">${item.time}</div>
                 <div class="portuguese">🇧🇷 ${item.pt}</div>
@@ -357,6 +385,10 @@
             document.getElementById('error-modal').style.display = 'flex';
             return;
         }
+
+        // Mutual Exclusion: Stop playback if active
+        window.speechSynthesis.cancel();
+
         if (currentRecIndex === index) {
             recognition.stop();
             return;
@@ -373,7 +405,10 @@
         const cleanSpoken = spokenText.toLowerCase().replace(/[^a-z0-9\s]/g, '');
         const cleanTarget = targetText.toLowerCase().replace(/[^a-z0-9\s]/g, '');
         
-        if (cleanTarget.includes(cleanSpoken) || cleanSpoken.includes(cleanTarget) || calculateSimilarity(cleanSpoken, cleanTarget) > 0.7) {
+        // Strict Mode: Removed .includes(), relying only on 60% similarity threshold
+        const similarity = calculateSimilarity(cleanSpoken, cleanTarget);
+
+        if (similarity > 0.6) {
             progressData[currentRecIndex] = Math.min(progressData[currentRecIndex] + 1, 4);
             saveProgress();
             updateProgressBarUI(currentRecIndex);
@@ -416,6 +451,12 @@
     }
 
     function speak(text, rate) {
+        // Mutual Exclusion: Stop recording if active
+        if (recognition && currentRecIndex !== -1) {
+            recognition.abort();
+            stopRecordingUI();
+        }
+
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'en-US';
