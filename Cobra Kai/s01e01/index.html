@@ -17,6 +17,8 @@
             min-height: 100vh;
             padding: 20px;
             color: #333;
+            display: flex;
+            flex-direction: column;
         }
         
         .container {
@@ -26,6 +28,7 @@
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            width: 100%;
         }
         
         header {
@@ -56,19 +59,23 @@
         
         .sentence-card {
             background: #f8f9fa;
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 20px;
-            margin-bottom: 20px;
-            border-left: 5px solid #3498db;
+            margin-bottom: 25px;
+            border-left: 6px solid #3498db;
             transition: transform 0.3s, box-shadow 0.3s;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
         }
         
         .sentence-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
         }
-        
+
         .timestamp {
             display: inline-block;
             background: #3498db;
@@ -89,7 +96,7 @@
         
         .english {
             color: #111;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
             margin-bottom: 8px;
             line-height: 1.4;
@@ -105,13 +112,15 @@
         
         .controls {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-top: 10px;
             flex-wrap: wrap;
+            justify-content: flex-start;
+            width: 100%;
         }
         
         button {
-            padding: 10px 16px;
+            padding: 10px 20px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
@@ -120,7 +129,7 @@
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
@@ -144,10 +153,11 @@
         }
         
         .progress-container {
-            margin-top: 15px;
+            margin-top: 20px;
             background: white;
-            padding: 10px;
+            padding: 8px;
             border-radius: 8px;
+            width: 100%;
         }
         
         .progress-steps {
@@ -168,9 +178,9 @@
         }
         
         .feedback {
-            margin-top: 10px;
-            font-size: 14px;
-            min-height: 20px;
+            margin-top: 15px;
+            font-size: 15px;
+            min-height: 24px;
             font-weight: 500;
         }
         
@@ -184,7 +194,16 @@
             100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
         }
 
-        /* Modal */
+        /* Footer Attribution */
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -207,12 +226,14 @@
             color: white;
             width: 100%;
             justify-content: center;
+            padding: 12px;
         }
 
         @media (max-width: 600px) {
             .controls { justify-content: space-between; }
-            button { flex: 1; justify-content: center; font-size: 13px; padding: 10px; }
-            .english { font-size: 18px; }
+            button { flex: 1; justify-content: center; font-size: 13px; padding: 10px 5px; }
+            .english { font-size: 19px; }
+            .reset-btn { margin-left: 0; flex: 0 0 auto; }
         }
     </style>
 </head>
@@ -220,15 +241,19 @@
 
 <div class="container">
     <header>
-        <h1>🎬 Cobra Kai S01E01</h1>
+        <h1>🥋 Cobra Kai S01E01 (Strict Mode)</h1>
         <div class="intro">
-            Click ▶️ to hear the original line, 🐢 to hear it slower, and 🔴 to record your pronunciation.
+            Click ▶️ to hear the line, 🐢 to hear it slower, and 🔴 to record your pronunciation.
         </div>
     </header>
     
     <div class="content" id="cards-container">
         </div>
 </div>
+
+<footer>
+    Created by Jonas Freitas Goes
+</footer>
 
 <div id="error-modal" class="modal">
     <div class="modal-content">
@@ -239,52 +264,53 @@
 </div>
 
 <script>
+    // 10151401190618050920011907150519
     const sentences = [
-        {
-            time: "03:53",
-            en: "The only good thing here is that I don't have to talk to anybody.",
-            pt: "A única coisa boa daqui é que não preciso falar com ninguém.",
-            trans: "The ôunli gúd thing rírh iz théráirôunt rév tchu tók tchu énibári."
+        { 
+            time: "00:18", 
+            en: "This is the moment we've been waiting for.", 
+            pt: "Este é o momento que esperávamos.", 
+            trans: "This iz the môu ment uív bín uêi ring forh." 
         },
-        {
-            time: "06:59",
-            en: "You know what? I hated this damn job anyway.",
-            pt: "Quer saber? Eu odiava esse trabalho mesmo.",
-            trans: "Iu nôu uát? Ái rêired this dém djób éni uêi."
+        { 
+            time: "01:01", 
+            en: "Sweep the leg.", 
+            pt: "Acerte a perna.", 
+            trans: "Suíp the lég." 
         },
-        {
-            time: "12:38",
-            en: "All right, you want my advice? Stop being so annoying.",
-            pt: "Olha, quer um conselho? Deixe de ser tão irritante.",
-            trans: "Ól rháit, iu uónt mái ad váis? Stóp bí ing sôu an ó ing."
+        { 
+            time: "01:08", 
+            en: "No mercy.", 
+            pt: "Sem compaixão.", 
+            trans: "Nôu mâr si." 
         },
-        {
-            time: "15:53",
-            en: "God doesn't give people things He doesn't want 'em to use.",
-            pt: "Deus não dá às pessoas coisas que Ele não quer que usem.",
-            trans: "Gód dâzent giv pípol things Rí dâzent uónt em tchu iúz."
+        { 
+            time: "25:44", 
+            en: "Once you go down this path, there's no turning back.", 
+            pt: "Se seguir esse caminho, não haverá volta.", 
+            trans: "Uáns iu gôu dáun this péth thérhz nôu târ ning béc." 
         },
-        {
-            time: "22:50",
-            en: "All right. That's all water under the bridge.",
-            pt: "Águas passadas não movem moinhos.",
-            trans: "Ól rháit. Théts ól uórerh ânderh the bridj."
+        { 
+            time: "25:51", 
+            en: "I'm gonna be your sensei.", 
+            pt: "Vou ser seu Sensei.", 
+            trans: "Áim gó na bí iór sén sêi." 
         },
-        {
-            time: "24:00",
-            en: "You know what? It’s on the house.",
-            pt: "Quer saber? Por conta da casa.",
-            trans: "Iu nôu uát? Its ón the ráus."
+        { 
+            time: "26:12", 
+            en: "I'm not just gonna teach you how to conquer your fears.", 
+            pt: "Não vou apenas te ensinar a vencer seus medos.", 
+            trans: "Áim nót djâst gó na títch iu rháu tchu cón kerh iór fírhz." 
         },
-        {
-            time: "26:15",
-            en: "I'm gonna teach you how to awaken the snake within you.",
-            pt: "Vou te ensinar a despertar a cobra que existe dentro de você.",
-            trans: "Áim gôna títch iu ráura a uêi ken the snêik uithín iu."
+        { 
+            time: "26:15", 
+            en: "I'm gonna teach you how to awaken the snake within you.", 
+            pt: "Vou te ensinar a despertar a cobra que existe dentro de você.", 
+            trans: "Áim gó na títch iu rháu tchu a uêi ken the snêic ui thin iú." 
         }
     ];
 
-    const STORAGE_KEY = 'cobra_kai_s01e01_v1';
+    const STORAGE_KEY = 'cobra_kai_s01e01_strict_v2';
     let recognition;
     let currentRecIndex = -1;
     let progressData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
@@ -297,6 +323,7 @@
 
             const card = document.createElement('div');
             card.className = 'sentence-card';
+            
             card.innerHTML = `
                 <div class="timestamp">${item.time}</div>
                 <div class="portuguese">🇧🇷 ${item.pt}</div>
@@ -357,6 +384,9 @@
             document.getElementById('error-modal').style.display = 'flex';
             return;
         }
+
+        window.speechSynthesis.cancel();
+
         if (currentRecIndex === index) {
             recognition.stop();
             return;
@@ -373,14 +403,30 @@
         const cleanSpoken = spokenText.toLowerCase().replace(/[^a-z0-9\s]/g, '');
         const cleanTarget = targetText.toLowerCase().replace(/[^a-z0-9\s]/g, '');
         
-        if (cleanTarget.includes(cleanSpoken) || cleanSpoken.includes(cleanTarget) || calculateSimilarity(cleanSpoken, cleanTarget) > 0.7) {
+        // STRICT MODE LOGIC
+        // 1. Calculate length ratio (Spoken must be at least 80% length of target)
+        const lengthRatio = cleanSpoken.length / cleanTarget.length;
+        
+        // 2. Calculate Similarity (Levenshtein)
+        const similarity = calculateSimilarity(cleanSpoken, cleanTarget);
+
+        // THRESHOLDS:
+        // Similarity must be > 85% (0.85)
+        // Length must be > 80% (0.8) of original (prevents one-word cheating)
+        
+        if (similarity > 0.85 && lengthRatio > 0.8) {
             progressData[currentRecIndex] = Math.min(progressData[currentRecIndex] + 1, 4);
             saveProgress();
             updateProgressBarUI(currentRecIndex);
             feedbackEl.innerText = `✅ "${spokenText}" - Good job!`;
             feedbackEl.className = "feedback success";
         } else {
-            feedbackEl.innerText = `❌ "${spokenText}" - Try again!`;
+            // Provide specific feedback if too short
+            if (lengthRatio <= 0.8) {
+                feedbackEl.innerText = `❌ Too short! Say the whole sentence.`;
+            } else {
+                feedbackEl.innerText = `❌ "${spokenText}" - Try again!`;
+            }
             feedbackEl.className = "feedback error";
         }
     }
@@ -416,6 +462,11 @@
     }
 
     function speak(text, rate) {
+        if (recognition && currentRecIndex !== -1) {
+            recognition.abort();
+            stopRecordingUI();
+        }
+
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'en-US';
