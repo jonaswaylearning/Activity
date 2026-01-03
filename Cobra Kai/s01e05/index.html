@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cobra Kai S01E05 - Adults</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        h1 { color: #2c3e50; margin-bottom: 10px; }
+
+        /* REPETITION PROGRESS BAR (4 Parts) */
+        .repetition-container {
+            display: flex;
+            justify-content: center;
+            gap: 8px; /* Space between the 4 parts */
+            margin-bottom: 20px;
+            width: 100%;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .rep-segment {
+            flex: 1;
+            height: 8px;
+            background-color: #ecf0f1;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .rep-segment.filled {
+            background-color: #27ae60; /* Green when done */
+            box-shadow: 0 0 5px rgba(39, 174, 96, 0.5);
+        }
+
+        .intro-box {
+            background-color: #e8f4fd;
+            border: 1px solid #b6e0fe;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            color: #555;
+            text-align: justify;
+        }
+
+        .slider-container {
+            position: relative;
+            height: 400px; 
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease;
+            transform: translateX(100px);
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: start;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+        }
+
+        .time-tag {
+            background-color: #3498db;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .sentence-pt {
+            color: #7f8c8d;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .sentence-en {
+            color: #2c3e50;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .transliteration {
+            color: #e67e22;
+            font-style: italic;
+            font-size: 1em;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: transform 0.1s, opacity 0.2s;
+            color: white;
+            font-weight: bold;
+        }
+
+        button:active { transform: scale(0.98); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-play { background-color: #2ecc71; }
+        .btn-slow { background-color: #f1c40f; color: #333; }
+        .btn-record { background-color: #e74c3c; }
+        .btn-record.recording { background-color: #c0392b; animation: pulse 1.5s infinite; }
+        .btn-reset { background-color: #95a5a6; } /* Grey for reset */
+        
+        .btn-nav { background-color: #34495e; margin: 0 5px; }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+
+        .result {
+            margin-top: 15px;
+            font-weight: bold;
+            min-height: 24px;
+        }
+        .success { color: #27ae60; }
+        .error { color: #c0392b; }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .counter { font-weight: bold; color: #555; }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 0.8em;
+            color: #bdc3c7;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🥋 Cobra Kai S01E05 (Adults)</h1>
+    
+    <div class="repetition-container">
+        <div class="rep-segment" id="seg-0"></div>
+        <div class="rep-segment" id="seg-1"></div>
+        <div class="rep-segment" id="seg-2"></div>
+        <div class="rep-segment" id="seg-3"></div>
+    </div>
+
+    <div class="intro-box">
+        Acesse o link pelo navegador Chrome. Clique em (▶️ Play) para ouvir, em (🐢 Slow) para ouvir mais lentamente e em (🔴 Record) para treinar a sua pronúncia. Repita cada item com no mínimo 60% da pronúncia correta, por quatro vezes.
+    </div>
+
+    <div class="slider-container" id="slider">
+        </div>
+
+    <div class="navigation">
+        <button class="btn-nav" id="prevBtn" onclick="changeSlide(-1)" disabled>⬅️ Previous</button>
+        <span class="counter" id="counter">1 / 7</span>
+        <button class="btn-nav" id="nextBtn" onclick="changeSlide(1)">Next ➡️</button>
+    </div>
+
+    <div class="footer">Created by Jonas Freitas Goes</div>
+</div>
+
+<script>
+    const sentences = [
+        {
+            time: "02:12",
+            en: "Your enemies won't always play by the rules.",
+            pt: "Seus inimigos nem sempre jogarão de acordo com as regras.",
+            trans: "Iór é ne miz uôunt ól uêiz plêi bái the rhúlz."
+        },
+        {
+            time: "05:40",
+            en: "I tried to change, but it didn't work.",
+            pt: "Eu tentei mudar, mas não funcionou.",
+            trans: "Ái trháid tchu tchêindj, bât it didnt uôrc."
+        },
+        {
+            time: "11:45",
+            en: "There is no easy way to say this.",
+            pt: "Não tem jeito fácil de dizer isso.",
+            trans: "Thérh iz nôu í zi uêi tchu sêi this."
+        },
+        {
+            time: "15:58",
+            en: "You haven't been honest with me.",
+            pt: "Você não tem sido honesto comigo.",
+            trans: "Iu rhé vent bín ó nest uith mi."
+        },
+        {
+            time: "23:20",
+            en: "Quiet! Enough thinking.",
+            pt: "Quieto! Chega de pensar.",
+            trans: "Quá iét! I nâf thin king."
+        },
+        {
+            time: "27:54",
+            en: "I'm working on it. I got a plan.",
+            pt: "Estou trabalhando nisso. Tenho um plano.",
+            trans: "Áim uôr cing ón it. Ái gót a plén."
+        },
+        {
+            time: "29:38",
+            en: "Just taking some time off to figure things out.",
+            pt: "Só tirando um tempo para entender as coisas.",
+            trans: "Djâst têi cing sâm táim óf tchu fí ghiur things áut."
+        }
+    ];
+
+    let currentSlide = 0;
+    let recognition;
+    let isRecording = false;
+    // Track repetitions for each slide (7 slides, start at 0)
+    let slideProgress = [0, 0, 0, 0, 0, 0, 0]; 
+
+    function initSlider() {
+        const slider = document.getElementById('slider');
+        sentences.forEach((item, index) => {
+            const slide = document.createElement('div');
+            slide.className = `slide ${index === 0 ? 'active' : ''}`;
+            slide.innerHTML = `
+                <div class="time-tag">${item.time}</div>
+                <div class="sentence-pt">🇧🇷 ${item.pt}</div>
+                <div class="sentence-en">🇺🇸 ${item.en}</div>
+                <div class="transliteration">🔤 ${item.trans}</div>
+                
+                <div class="controls">
+                    <button class="btn-play" onclick="speak('${item.en.replace(/'/g, "\\'")}', 1.0)">▶️ Play</button>
+                    <button class="btn-slow" onclick="speak('${item.en.replace(/'/g, "\\'")}', 0.7)">🐢 Slow</button>
+                    <button class="btn-record" id="recBtn_${index}" onclick="toggleRecording(${index})">🔴 Record</button>
+                    <button class="btn-reset" onclick="resetCurrentSlide()">🔄</button>
+                </div>
+                <div class="result" id="result_${index}"></div>
+            `;
+            slider.appendChild(slide);
+        });
+        updateCounter();
+        updateRepetitionBar();
+    }
+
+    function updateCounter() {
+        document.getElementById('counter').innerText = `${currentSlide + 1} / ${sentences.length}`;
+        document.getElementById('prevBtn').disabled = currentSlide === 0;
+        document.getElementById('nextBtn').disabled = currentSlide === sentences.length - 1;
+    }
+
+    function updateRepetitionBar() {
+        // Get current score (0 to 4)
+        const score = slideProgress[currentSlide];
+        // Loop through 4 segments
+        for(let i = 0; i < 4; i++) {
+            const seg = document.getElementById(`seg-${i}`);
+            if (i < score) {
+                seg.classList.add('filled');
+            } else {
+                seg.classList.remove('filled');
+            }
+        }
+    }
+
+    function resetCurrentSlide() {
+        slideProgress[currentSlide] = 0; // Reset count
+        document.getElementById(`result_${currentSlide}`).innerText = "";
+        document.getElementById(`result_${currentSlide}`).className = "result";
+        updateRepetitionBar();
+    }
+
+    function changeSlide(direction) {
+        const slides = document.querySelectorAll('.slide');
+        slides[currentSlide].classList.remove('active');
+        
+        window.speechSynthesis.cancel();
+        if(isRecording) stopRecording();
+
+        currentSlide += direction;
+        slides[currentSlide].classList.add('active');
+        
+        updateCounter();
+        updateRepetitionBar(); // Update bar for the new slide
+    }
+
+    function speak(text, rate) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = rate;
+        window.speechSynthesis.speak(utterance);
+    }
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onstart = function() {
+            isRecording = true;
+            const btn = document.getElementById(`recBtn_${currentSlide}`);
+            btn.classList.add('recording');
+            btn.innerText = "⏹ Stop";
+            document.getElementById(`result_${currentSlide}`).innerText = "👂 Listening...";
+            document.getElementById(`result_${currentSlide}`).className = "result";
+        };
+
+        recognition.onend = function() {
+            stopRecording();
+        };
+
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            validateSpeech(transcript);
+        };
+
+        recognition.onerror = function(event) {
+            stopRecording();
+            document.getElementById(`result_${currentSlide}`).innerText = "❌ Error: " + event.error;
+            document.getElementById(`result_${currentSlide}`).className = "result error";
+        };
+    } else {
+        alert("Seu navegador não suporta reconhecimento de voz. Por favor, use o Google Chrome.");
+    }
+
+    function toggleRecording(index) {
+        if (isRecording) {
+            recognition.stop();
+        } else {
+            recognition.start();
+        }
+    }
+
+    function stopRecording() {
+        isRecording = false;
+        const btn = document.getElementById(`recBtn_${currentSlide}`);
+        if(btn) {
+            btn.classList.remove('recording');
+            btn.innerText = "🔴 Record";
+        }
+    }
+
+    function validateSpeech(spokenText) {
+        const targetText = sentences[currentSlide].en;
+        const normalize = (str) => str.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+        const cleanSpoken = normalize(spokenText);
+        const cleanTarget = normalize(targetText);
+        
+        const similarity = calculateSimilarity(cleanSpoken, cleanTarget);
+        const feedbackEl = document.getElementById(`result_${currentSlide}`);
+
+        if (similarity >= 0.6) {
+            // SUCCESS
+            feedbackEl.innerText = `✅ "${spokenText}" (Match: ${Math.round(similarity * 100)}%)`;
+            feedbackEl.className = "result success";
+            
+            // Increment progress if less than 4
+            if(slideProgress[currentSlide] < 4) {
+                slideProgress[currentSlide]++;
+                updateRepetitionBar();
+            }
+            
+        } else {
+            // FAIL
+            feedbackEl.innerText = `❌ "${spokenText}" (Match: ${Math.round(similarity * 100)}%) - Try again!`;
+            feedbackEl.className = "result error";
+        }
+    }
+
+    function calculateSimilarity(s1, s2) {
+        let longer = s1;
+        let shorter = s2;
+        if (s1.length < s2.length) { longer = s2; shorter = s1; }
+        let longerLength = longer.length;
+        if (longerLength === 0) return 1.0;
+        return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+    }
+
+    function editDistance(s1, s2) {
+        s1 = s1.toLowerCase(); s2 = s2.toLowerCase();
+        let costs = new Array();
+        for (let i = 0; i <= s1.length; i++) {
+            let lastValue = i;
+            for (let j = 0; j <= s2.length; j++) {
+                if (i == 0) costs[j] = j;
+                else {
+                    if (j > 0) {
+                        let newValue = costs[j - 1];
+                        if (s1.charAt(i - 1) != s2.charAt(j - 1))
+                            newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                        costs[j - 1] = lastValue;
+                        lastValue = newValue;
+                    }
+                }
+            }
+            if (i > 0) costs[s2.length] = lastValue;
+        }
+        return costs[s2.length];
+    }
+
+    initSlider();
+</script>
+
+</body>
+</html>
