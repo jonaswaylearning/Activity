@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Pronunciation Practice - Cobra Kai (Adults)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .intro {
+            background-color: #e8f0fe;
+            color: #1a73e8;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #d2e3fc;
+            max-width: 600px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .slider-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            overflow: hidden;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 0 0 20px 0;
+        }
+
+        /* Top Header with Progress and Reset */
+        .top-header {
+            display: flex;
+            align-items: center;
+            background-color: #ecf0f1;
+            height: 40px;
+            padding: 0 10px;
+            justify-content: space-between;
+        }
+
+        .progress-container {
+            flex-grow: 1;
+            background-color: #bdc3c7;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-right: 15px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #3498db;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .btn-reset {
+            background: none;
+            border: 1px solid #95a5a6;
+            color: #7f8c8d;
+            padding: 4px 8px;
+            font-size: 0.8em;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-reset:hover {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .slide-content {
+            padding: 20px 20px 0 20px;
+        }
+
+        .slide {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            animation: fadeIn 0.5s;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .english-text {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .phonetic-text {
+            font-size: 1.1em;
+            color: #d35400;
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+
+        .portuguese-text {
+            font-size: 1em;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+
+        /* 3-Stage Card Progress */
+        .stage-wrapper {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            justify-content: center;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        .stage-segment {
+            flex: 1;
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            transition: background-color 0.4s ease, transform 0.2s;
+        }
+
+        .stage-segment.completed {
+            background-color: #27ae60;
+            transform: scale(1.1);
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Specific Button Styles */
+        .btn-play { background-color: #3498db; color: white; }
+        .btn-play:hover { background-color: #2980b9; }
+
+        .btn-slow { background-color: #f1c40f; color: #2c3e50; }
+        .btn-slow:hover { background-color: #f39c12; }
+
+        .btn-record { background-color: #e74c3c; color: white; }
+        .btn-record:hover { background-color: #c0392b; }
+        .btn-record.recording { animation: pulse 1.5s infinite; background-color: #c0392b; }
+
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding: 15px 20px 0 20px;
+            box-sizing: border-box;
+        }
+
+        .btn-nav {
+            background-color: #ecf0f1;
+            color: #2c3e50;
+        }
+        .btn-nav:hover { background-color: #bdc3c7; }
+        
+        .btn-nav:disabled {
+            background-color: #f7f9fa;
+            color: #bdc3c7;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .counter {
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+
+        .result {
+            margin-top: 15px;
+            font-weight: bold;
+            min-height: 24px;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .success { color: #27ae60; }
+        .error { color: #c0392b; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #95a5a6;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="intro">
+        Acesse o link pelo navegador Chrome. Clique em (▶️ Play) para ouvir, em (🐢 Slow) para ouvir mais lentamente e em (🔴 Record) para treinar a sua pronúncia. Repita cada item com no mínimo 60% da pronúncia correta, <strong>por três vezes</strong> para avançar.
+    </div>
+
+    <div class="slider-container">
+        <div class="top-header">
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <button class="btn-reset" onclick="resetLesson()" title="Reset all progress">🔄 Reset</button>
+        </div>
+
+        <div class="slide-content">
+            <div id="slides-wrapper">
+                </div>
+
+            <div class="result" id="result-msg"></div>
+
+            <div class="nav-controls">
+                <button class="btn-nav" onclick="changeSlide(-1)">⬅️ Previous</button>
+                <span class="counter" id="slide-counter">1 / 7</span>
+                <button class="btn-nav" id="btn-next" onclick="changeSlide(1)">Next ➡️</button>
+            </div>
+        </div>
+    </div>
+
+    <footer style="text-align: center; margin-top: 20px;">Created by Jonas Freitas Goes</footer>
+
+    <script>
+        // 10151401190618050920011907150519
+
+        const sentences = [
+            {
+                en: "Let's just give it a chance.",
+                pt: "Vamos apenas dar uma chance.",
+                phonetic: "Léts djâst ghív it a tchéns."
+            },
+            {
+                en: "This goes against everything I stand for.",
+                pt: "Isso vai contra tudo o que eu defendo.",
+                phonetic: "Dhis gôuz a-ghénst é-vri-thing ái sténd fór."
+            },
+            {
+                en: "You can't expect people to do what they're supposed to do.",
+                pt: "Você não pode esperar que as pessoas façam o que deveriam fazer.",
+                phonetic: "Iú ként eks-pékt pí-pol tu du u-ót dhéi ar sa-pôust tu du."
+            },
+            {
+                en: "I'm sorry for calling you out inside.",
+                pt: "Desculpe por ter chamado sua atenção lá dentro.",
+                phonetic: "Áim só-rhi fór kó-lin iú áut in-sáid."
+            },
+            {
+                en: "I need to see where you're at.",
+                pt: "Preciso ver em que nível você está.",
+                phonetic: "Ái níd tu sí u-ér iúr ét."
+            },
+            {
+                en: "Think you can handle that?",
+                pt: "Acha que dá conta disso?",
+                phonetic: "Think iú ken hén-dol dhét?"
+            },
+            {
+                en: "It's just temporary, all right?",
+                pt: "É só temporário, tá bom?",
+                phonetic: "Its djâst tém-po-ré-rhi, ól rháit?"
+            }
+        ];
+
+        let currentSlide = 0;
+        let recognition;
+        let isRecording = false;
+        // Track progress for each slide: 0, 1, 2, or 3 successes
+        let slideProgress = new Array(sentences.length).fill(0);
+
+        function init() {
+            const wrapper = document.getElementById('slides-wrapper');
+            sentences.forEach((item, index) => {
+                const slide = document.createElement('div');
+                slide.className = `slide ${index === 0 ? 'active' : ''}`;
+                slide.innerHTML = `
+                    <div class="english-text">${item.en}</div>
+                    <div class="phonetic-text">${item.phonetic}</div>
+                    <div class="portuguese-text">${item.pt}</div>
+                    
+                    <div class="stage-wrapper" id="stage-wrapper-${index}">
+                        <div class="stage-segment"></div>
+                        <div class="stage-segment"></div>
+                        <div class="stage-segment"></div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="btn-play" onclick="playAudio('${item.en.replace(/'/g, "\\'")}', 1)">▶️ Play</button>
+                        <button class="btn-slow" onclick="playAudio('${item.en.replace(/'/g, "\\'")}', 0.5)">🐢 Slow</button>
+                        <button class="btn-record" id="rec-btn-${index}" onclick="toggleRecording(${index})">🔴 Record</button>
+                    </div>
+                `;
+                wrapper.appendChild(slide);
+            });
+            updateUI();
+            setupSpeechRecognition();
+        }
+
+        function resetLesson() {
+            if(confirm("Tem certeza que deseja reiniciar o progresso?")) {
+                // Reset State
+                currentSlide = 0;
+                slideProgress = new Array(sentences.length).fill(0);
+                
+                // Reset Slide Visibility
+                const slides = document.querySelectorAll('.slide');
+                slides.forEach(s => s.classList.remove('active'));
+                slides[0].classList.add('active');
+
+                // Reset Visuals (segments)
+                document.querySelectorAll('.stage-segment').forEach(seg => {
+                    seg.classList.remove('completed');
+                });
+
+                // Clear Messages
+                document.getElementById('result-msg').textContent = "";
+                document.getElementById('result-msg').className = "result";
+                
+                // Stop audio/recording
+                speechSynthesis.cancel();
+                if(isRecording) stopRecording(0); // Using 0 as fallback index
+                
+                // Update UI
+                updateUI();
+            }
+        }
+
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.slide');
+            
+            // Prevent moving forward if current slide isn't complete
+            if (direction === 1 && slideProgress[currentSlide] < 3) {
+                return; 
+            }
+
+            slides[currentSlide].classList.remove('active');
+            
+            speechSynthesis.cancel();
+            if (isRecording) stopRecording(currentSlide);
+
+            currentSlide += direction;
+            
+            if (currentSlide < 0) currentSlide = slides.length - 1;
+            if (currentSlide >= slides.length) currentSlide = 0;
+            
+            slides[currentSlide].classList.add('active');
+            document.getElementById('result-msg').textContent = "";
+            document.getElementById('result-msg').className = "result";
+            updateUI();
+        }
+
+        function updateUI() {
+            // Update Counter
+            document.getElementById('slide-counter').textContent = `${currentSlide + 1} / ${sentences.length}`;
+            
+            // Update Global Progress Bar
+            // We can make the global bar reflect TOTAL progress (completed sentences) or current position.
+            // Let's stick to current position for navigation context:
+            const progressPercentage = ((currentSlide + 1) / sentences.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPercentage}%`;
+
+            // Lock/Unlock Next Button
+            const nextBtn = document.getElementById('btn-next');
+            if (slideProgress[currentSlide] >= 3) {
+                nextBtn.disabled = false;
+                nextBtn.title = "Próximo";
+            } else {
+                nextBtn.disabled = true;
+                nextBtn.title = "Complete 3 repetições para desbloquear";
+            }
+        }
+
+        function updateStageVisuals(slideIndex) {
+            const wrapper = document.getElementById(`stage-wrapper-${slideIndex}`);
+            const segments = wrapper.querySelectorAll('.stage-segment');
+            const score = slideProgress[slideIndex];
+            
+            segments.forEach((seg, i) => {
+                if (i < score) {
+                    seg.classList.add('completed');
+                } else {
+                    seg.classList.remove('completed');
+                }
+            });
+        }
+
+        function playAudio(text, rate) {
+            if (isRecording) stopRecording(currentSlide);
+            speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = rate;
+            speechSynthesis.speak(utterance);
+        }
+
+        function setupSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                recognition.onstart = () => {
+                    isRecording = true;
+                    document.getElementById(`rec-btn-${currentSlide}`).classList.add('recording');
+                    document.getElementById('result-msg').textContent = "Listening...";
+                    document.getElementById('result-msg').className = "result";
+                };
+
+                recognition.onend = () => {
+                    isRecording = false;
+                    const btn = document.getElementById(`rec-btn-${currentSlide}`);
+                    if(btn) btn.classList.remove('recording');
+                };
+
+                recognition.onresult = (event) => {
+                    const speechResult = event.results[0][0].transcript;
+                    checkPronunciation(speechResult);
+                };
+
+                recognition.onerror = (event) => {
+                    document.getElementById('result-msg').textContent = "Error: " + event.error;
+                    isRecording = false;
+                    document.getElementById(`rec-btn-${currentSlide}`).classList.remove('recording');
+                };
+            } else {
+                alert("Seu navegador não suporta reconhecimento de voz. Por favor, use o Google Chrome.");
+            }
+        }
+
+        function toggleRecording(index) {
+            speechSynthesis.cancel();
+            if (isRecording) {
+                stopRecording(index);
+            } else {
+                recognition.start();
+            }
+        }
+
+        function stopRecording(index) {
+            recognition.stop();
+            isRecording = false;
+            const btn = document.getElementById(`rec-btn-${index}`);
+            if(btn) btn.classList.remove('recording');
+        }
+
+        function checkPronunciation(spokenText) {
+            const targetText = sentences[currentSlide].en;
+            const similarityScore = calculateSimilarity(spokenText.toLowerCase(), targetText.toLowerCase());
+            
+            const msgDiv = document.getElementById('result-msg');
+            const percentage = Math.round(similarityScore * 100);
+
+            if (similarityScore >= 0.6) {
+                // Success logic
+                if (slideProgress[currentSlide] < 3) {
+                    slideProgress[currentSlide]++;
+                    updateStageVisuals(currentSlide);
+                    updateUI(); // Check if we should unlock next button
+                }
+
+                if (slideProgress[currentSlide] === 3) {
+                    msgDiv.textContent = `🎉 Completed! You said: "${spokenText}" (${percentage}%)`;
+                    msgDiv.className = "result success";
+                } else {
+                    msgDiv.textContent = `✅ Good job! (${slideProgress[currentSlide]}/3) You said: "${spokenText}" (${percentage}%)`;
+                    msgDiv.className = "result success";
+                }
+
+            } else {
+                msgDiv.textContent = `❌ Try again. You said: "${spokenText}" (${percentage}%)`;
+                msgDiv.className = "result error";
+            }
+        }
+
+        // Levenshtein Distance Algorithm
+        function calculateSimilarity(s1, s2) {
+            s1 = s1.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").trim();
+            s2 = s2.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").trim();
+
+            let longer = s1;
+            let shorter = s2;
+            if (s1.length < s2.length) {
+                longer = s2;
+                shorter = s1;
+            }
+            const longerLength = longer.length;
+            if (longerLength === 0) return 1.0;
+            return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+        }
+
+        function editDistance(s1, s2) {
+            s1 = s1.toLowerCase();
+            s2 = s2.toLowerCase();
+            const costs = new Array();
+            for (let i = 0; i <= s1.length; i++) {
+                let lastValue = i;
+                for (let j = 0; j <= s2.length; j++) {
+                    if (i === 0)
+                        costs[j] = j;
+                    else {
+                        if (j > 0) {
+                            let newValue = costs[j - 1];
+                            if (s1.charAt(i - 1) !== s2.charAt(j - 1))
+                                newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                            costs[j - 1] = lastValue;
+                            lastValue = newValue;
+                        }
+                    }
+                }
+                if (i > 0)
+                    costs[s2.length] = lastValue;
+            }
+            return costs[s2.length];
+        }
+
+        init();
+    </script>
+</body>
+</html>
