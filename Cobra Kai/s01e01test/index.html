@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Pronunciation Practice - Cobra Kai (Adults)</title>
+    <title>English Pronunciation Practice - Cobra Kai Phrases</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -260,39 +260,39 @@
 
         const sentences = [
             {
-                en: "Let's just give it a chance.",
-                pt: "Vamos apenas dar uma chance.",
-                phonetic: "Léts djâst ghív it a tchéns."
+                en: "The only good thing here is that I don't have to talk to anybody.",
+                pt: "A única coisa boa daqui é que não preciso falar com ninguém.",
+                phonetic: "The ôunli gúd thing rírh iz théráirôunt rév tchu tók tchu énibári."
             },
             {
-                en: "This goes against everything I stand for.",
-                pt: "Isso vai contra tudo o que eu defendo.",
-                phonetic: "Dhis gôuz a-ghénst é-vri-thing ái sténd fór."
+                en: "You know what? I hated this damn job anyway.",
+                pt: "Quer saber? Eu odiava esse trabalho mesmo.",
+                phonetic: "Iu nôu uát? Ái rêired this dém djób éni uêi."
             },
             {
-                en: "You can't expect people to do what they're supposed to do.",
-                pt: "Você não pode esperar que as pessoas façam o que deveriam fazer.",
-                phonetic: "Iú ként eks-pékt pí-pol tu du u-ót dhéi ar sa-pôust tu du."
+                en: "All right, you want my advice? Stop being so annoying.",
+                pt: "Olha, quer um conselho? Deixe de ser tão irritante.",
+                phonetic: "Ól rháit, iu uónt mái ad váis? Stóp bí ing sôu an ó ing."
             },
             {
-                en: "I'm sorry for calling you out inside.",
-                pt: "Desculpe por ter chamado sua atenção lá dentro.",
-                phonetic: "Áim só-rhi fór kó-lin iú áut in-sáid."
+                en: "God doesn't give people things He doesn't want 'em to use.",
+                pt: "Deus não dá às pessoas coisas que Ele não quer que usem.",
+                phonetic: "Gód dâzent giv pípol things Rí dâzent uónt em tchu iúz."
             },
             {
-                en: "I need to see where you're at.",
-                pt: "Preciso ver em que nível você está.",
-                phonetic: "Ái níd tu sí u-ér iúr ét."
+                en: "All right. That's all water under the bridge.",
+                pt: "Águas passadas não movem moinhos.",
+                phonetic: "Ól rháit. Théts ól uórerh ânderh the bridj."
             },
             {
-                en: "Think you can handle that?",
-                pt: "Acha que dá conta disso?",
-                phonetic: "Think iú ken hén-dol dhét?"
+                en: "You know what? It’s on the house.",
+                pt: "Quer saber? Por conta da casa.",
+                phonetic: "Iu nôu uát? Its ón the ráus."
             },
             {
-                en: "It's just temporary, all right?",
-                pt: "É só temporário, tá bom?",
-                phonetic: "Its djâst tém-po-ré-rhi, ól rháit?"
+                en: "I'm gonna teach you how to awaken the snake within you.",
+                pt: "Vou te ensinar a despertar a cobra que existe dentro de você.",
+                phonetic: "Áim gôna títch iu ráura a uêi ken the snêik uithín iu."
             }
         ];
 
@@ -332,25 +332,20 @@
 
         function resetLesson() {
             if(confirm("Tem certeza que deseja reiniciar o progresso?")) {
-                // Reset State
                 currentSlide = 0;
                 slideProgress = new Array(sentences.length).fill(0);
                 
-                // Reset Slide Visibility
                 const slides = document.querySelectorAll('.slide');
                 slides.forEach(s => s.classList.remove('active'));
                 slides[0].classList.add('active');
 
-                // Reset Visuals (segments)
                 document.querySelectorAll('.stage-segment').forEach(seg => {
                     seg.classList.remove('completed');
                 });
 
-                // Clear Messages
                 document.getElementById('result-msg').textContent = "";
                 document.getElementById('result-msg').className = "result";
                 
-                // Stop audio/recording
                 speechSynthesis.cancel();
                 if(isRecording) stopRecording(0); 
                 
@@ -361,8 +356,8 @@
         function changeSlide(direction) {
             const slides = document.querySelectorAll('.slide');
             
-            // NAVIGATION UNLOCKED: Removed check for slideProgress
-            
+            // Unlocked navigation: No condition check here
+
             slides[currentSlide].classList.remove('active');
             
             speechSynthesis.cancel();
@@ -380,15 +375,10 @@
         }
 
         function updateUI() {
-            // Update Counter
             document.getElementById('slide-counter').textContent = `${currentSlide + 1} / ${sentences.length}`;
             
-            // Update Global Progress Bar
             const progressPercentage = ((currentSlide + 1) / sentences.length) * 100;
             document.getElementById('progress-bar').style.width = `${progressPercentage}%`;
-
-            // UNLOCKED: Button is always enabled
-            // The logic to disable it has been removed.
         }
 
         function updateStageVisuals(slideIndex) {
@@ -474,11 +464,9 @@
             const percentage = Math.round(similarityScore * 100);
 
             if (similarityScore >= 0.6) {
-                // Success logic
                 if (slideProgress[currentSlide] < 3) {
                     slideProgress[currentSlide]++;
                     updateStageVisuals(currentSlide);
-                    // Removed updateUI() call here since button doesn't need unlocking
                 }
 
                 if (slideProgress[currentSlide] === 3) {
