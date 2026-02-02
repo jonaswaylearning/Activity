@@ -299,8 +299,10 @@
         let currentSlide = 0;
         let recognition;
         let isRecording = false;
-        // Track progress for each slide: 0, 1, 2, or 3 successes
         let slideProgress = new Array(sentences.length).fill(0);
+
+        // Success Sound (Short Ding)
+        const successSound = new Audio("data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAAAAAD/AAAAAAAA////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////7///3///1///z///x///v///t///r///p///nf//lP//jP//gv//dP//Zf//TP//KP//EP//AP//9f/86//z3//Lzf+wqv6Ujf1sbf1DTv0aL/38+v3f6/3Cz/2gqv19kP1Wav0uTP0HFv3u+P3O7f291f2fuP1/mP1ccf04Uf0VF/33/P3U8P2+2f2lwf2CnP1hdv09Vf0ZGf36/v3X8v3C3P2pxP2Fof1mev1BWv0dHP39/v3a9P3E3v2syP2Ip/1qfv1FXv0hH/3//f3c9f3G4P2uy/2Lqf1sYP1IYP0kIv0AAf7e9v3I4f2wzf2Nq/1uY/1LZf0nJP0DA/7g9/3K4v2xz/2OrP1vZP1NZv0pJv0FA/7h+P3L4/2yz/2PrP1wZf1OaP0qJ/0HBP7j+P3M5P200P2Qrf1xZ/1Pav0sKP0IBf7k+f3N5f210f2Rr/1yaP1Ra/0tKf0KBv7l+v3O5v220v2SsP1zaf1SbP0uKv0LB/7m+v3P5/230/2Tsf10av1Tbv0vK/0MCP7n+/3Q6P241P2Us/11a/1Ub/0wLP0NCP7o/P3R6f251f2VtP12bP1VcQNwLAAA");
 
         function init() {
             const wrapper = document.getElementById('slides-wrapper');
@@ -356,8 +358,6 @@
         function changeSlide(direction) {
             const slides = document.querySelectorAll('.slide');
             
-            // Unlocked navigation: No condition check here
-
             slides[currentSlide].classList.remove('active');
             
             speechSynthesis.cancel();
@@ -464,6 +464,10 @@
             const percentage = Math.round(similarityScore * 100);
 
             if (similarityScore >= 0.6) {
+                // PLAY SUCCESS SOUND
+                successSound.currentTime = 0; // Reset sound to start
+                successSound.play();
+
                 if (slideProgress[currentSlide] < 3) {
                     slideProgress[currentSlide]++;
                     updateStageVisuals(currentSlide);
