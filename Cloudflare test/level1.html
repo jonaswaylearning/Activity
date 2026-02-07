@@ -20,6 +20,7 @@
         .step-dot.active { background-color: #10b981; border-color: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.4); }
     </style>
 </head>
+
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
 
 <div class="w-full max-w-md bg-white rounded-t-xl shadow-sm border-b p-4 flex justify-between items-center">
@@ -38,14 +39,14 @@
 
     <div class="mt-4">
         <div class="flex justify-between gap-4 mb-6">
-            <button onclick="changeSlide(-1)" class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold">Back</button>
-            <button onclick="changeSlide(1)" class="flex-1 py-3 bg-gray-800 text-white rounded-lg font-bold">Next</button>
+            <button id="btn-prev" onclick="changeSlide(-1)" class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold hover:bg-gray-200">Back</button>
+            <button id="btn-next" onclick="changeSlide(1)" class="flex-1 py-3 bg-gray-800 text-white rounded-lg font-bold hover:bg-black">Next</button>
         </div>
         <div id="global-progress" class="flex justify-center gap-1.5"></div>
     </div>
 </div>
 
-<footer class="mt-6 text-gray-400 text-xs">Jonas Way English – Mastery Method</footer>
+<footer class="mt-6 text-gray-400 text-xs">Jonas Way English - Mastery Method</footer>
 
 <script>
     // GLOBAL STATE
@@ -64,13 +65,14 @@
             init();
         })
         .catch(err => {
-            alert("Failed to load content.");
+            alert("Failed to load content");
             console.error(err);
         });
 
     function init() {
         const wrapper = document.getElementById('cards-wrapper');
         const globalProgress = document.getElementById('global-progress');
+
         wrapper.innerHTML = "";
         globalProgress.innerHTML = "";
 
@@ -79,32 +81,66 @@
             card.className = `card ${i === 0 ? 'active' : ''} text-center`;
             card.innerHTML = `
                 <span class="grammar-tag type-${item.type.toLowerCase()}">${item.type}</span>
-                <h2 class="text-3xl font-bold text-gray-800 mt-2">${item.en}</h2>
-                <p class="text-blue-600 italic">${item.phonetic}</p>
-                <p class="text-gray-400 text-sm mb-6">${item.pt}</p>
-                <div class="flex justify-center gap-2 mb-6">
+                <h2 class="text-3xl font-bold text-gray-800 mt-2 mb-2">${item.en}</h2>
+                <p class="text-xl text-blue-600 font-medium italic mb-1">${item.phonetic || ""}</p>
+                <p class="text-gray-400 mb-6 text-sm">${item.pt || ""}</p>
+
+                <div class="flex justify-center gap-3 mb-8">
                     <div id="step-${i}-1" class="step-dot"></div>
                     <div id="step-${i}-2" class="step-dot"></div>
                     <div id="step-${i}-3" class="step-dot"></div>
                 </div>
+
+                <div class="flex justify-center items-center gap-4">
+                    <button onclick="playAudio('${item.en}', 0.5)" class="w-12 h-12 bg-orange-50 text-orange-500 rounded-full">🐢</button>
+                    <button onclick="playAudio('${item.en}', 1)" class="w-20 h-20 bg-blue-600 text-white rounded-full">▶️</button>
+                    <button onclick="toggleRecording(${i})" id="rec-btn-${i}" class="w-16 h-16 bg-red-100 text-red-600 rounded-full">🎤</button>
+                </div>
             `;
             wrapper.appendChild(card);
 
-            const dot = document.createElement('div');
-            dot.className = "h-1 w-3 rounded-full bg-gray-200";
-            globalProgress.appendChild(dot);
+            const gDot = document.createElement('div');
+            gDot.className = 'h-1 w-3 rounded-full bg-gray-200';
+            globalProgress.appendChild(gDot);
         });
 
+        setupSpeechRecognition();
+        updateUI();
+    }
+
+    function playAudio(text, rate) {
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-US';
+        u.rate = rate;
+        speechSynthesis.speak(u);
+    }
+
+    function setupSpeechRecognition() {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) return alert("Chrome required.");
+        recognition = new SR();
+        recognition.lang = 'en-US';
+        recognition.onresult = e => checkPronunciation(e.results[0][0].transcript);
+    }
+
+    function toggleRecording() {
+        recognition.start();
+    }
+
+    function checkPronunciation(spoken) {
+        const target = sentences[currentIndex].en;
+        const score = spoken.toLowerCase() === target.toLowerCase() ? 1 : 0;
+        if (score && slideProgress[currentIndex] < 3) {
+            slideProgress[currentIndex]++;
+            document.getElementById(`step-${currentIndex}-${slideProgress[currentIndex]}`).classList.add('active');
+        }
         updateUI();
     }
 
     function updateUI() {
-        document.querySelectorAll('.card').forEach((c, i) =>
-            c.classList.toggle('active', i === currentIndex)
-        );
-
-        document.getElementById('counter').innerText =
-            `Card ${currentIndex + 1} of ${sentences.length}`;
+        document.querySelectorAll('.card').forEach((c, i) => c.classList.toggle('active', i === currentIndex));
+        document.getElementById('counter').innerText = `Card ${currentIndex + 1} of ${sentences.length}`;
     }
 
     function changeSlide(dir) {
@@ -116,5 +152,6 @@
         if (confirm("Reset everything?")) location.reload();
     }
 </script>
+
 </body>
 </html>
