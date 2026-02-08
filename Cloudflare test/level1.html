@@ -260,15 +260,25 @@ function calculateSimilarity(s1, s2) {
 }
 
 function updateUI() {
+    const container = document.getElementById('slider-container');
+
+    if (slideProgress[currentIndex] === 3) {
+        container.classList.add('mastery-achieved');
+    } else {
+        container.classList.remove('mastery-achieved');
+    }
+
     document.querySelectorAll('.card').forEach((c, i) =>
         c.classList.toggle('active', i === currentIndex)
     );
+
     document.querySelectorAll('#global-progress div').forEach((d, i) => {
         d.className =
           `h-1 w-3 rounded-full transition-all duration-400 ` +
           (i === currentIndex ? 'bg-gray-800 w-6' :
            slideProgress[i] === 3 ? 'bg-amber-400' : 'bg-gray-200');
     });
+
     document.getElementById('counter').innerText =
       `Card ${currentIndex + 1} of ${sentences.length}`;
 }
@@ -289,3 +299,4 @@ function confirmReset() {
 </script>
 </body>
 </html>
+
