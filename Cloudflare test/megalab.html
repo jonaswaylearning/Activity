@@ -3,133 +3,144 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jonas Way English - Mastery System</title>
+<title>Jonas Way English - Mastery System v5.6</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
-body { font-family:'Inter',sans-serif; background:#f3f4f6; }
-.card { display:none; }
-.card.active { display:block; }
-.grammar-tag { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
-.type-affirmative { color:#059669; }
-.type-negative { color:#dc2626; }
-.type-interrogative { color:#2563eb; }
-.step-dot { width:12px; height:12px; border-radius:50%; border:2px solid #e5e7eb; transition:.3s; }
-.step-dot.active { background:#10b981; border-color:#10b981; box-shadow:0 0 8px rgba(16,185,129,.4); }
-.recording-pulse { animation:pulse 1.2s infinite; }
-@keyframes pulse { 0%{transform:scale(1)}50%{transform:scale(1.1)}100%{transform:scale(1)} }
+body { font-family: 'Inter', sans-serif; background: #f3f4f6; -webkit-tap-highlight-color: transparent; }
+.card { display: none; }
+.card.active { display: block; }
+.grammar-tag { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; }
+.type-affirmative { color: #059669; }
+.type-negative { color: #dc2626; }
+.type-interrogative { color: #2563eb; }
+
+.recording-pulse { animation: pulse 1.2s infinite; color: #ef4444; }
+@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+.step-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #e5e7eb; transition: all 0.4s cubic-bezier(0.175,0.885,0.32,1.275); }
+.step-dot.active { background-color: #10b981; border-color: #10b981; transform: scale(1.2); box-shadow: 0 0 10px rgba(16,185,129,0.5); }
+
+.pop-success { animation: pop 0.4s ease-out; }
+@keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.5); } 100% { transform: scale(1.2); } }
+
+.mastery-card { transition: all 0.5s; border: 2px solid transparent; }
+.mastery-achieved { border-color: #fbbf24; box-shadow: 0 0 25px rgba(251,191,36,0.2); background: #fffbeb; }
+
+.mastery-text { animation: slideUp 0.5s ease-out forwards; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+button:active { transform: scale(0.95); }
 </style>
 </head>
 
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
 
 <div class="w-full max-w-md bg-white rounded-t-xl shadow-sm border-b p-4 flex justify-between items-center">
-  <div>
+  <div class="flex flex-col">
     <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Jonas Way English</span>
-    <span id="counter" class="text-sm font-semibold text-gray-700">Loading…</span>
+    <span class="text-sm font-semibold text-gray-700" id="counter">Loading…</span>
   </div>
-  <button onclick="confirmReset()" class="text-gray-400 hover:text-red-500 text-xl">⟲</button>
+  <button onclick="confirmReset()" class="text-gray-400 hover:text-red-500 transition-colors">
+    🗑️
+  </button>
 </div>
 
-<div class="w-full max-w-md bg-white rounded-b-xl shadow-lg p-8 min-h-[480px] flex flex-col justify-between">
+<div id="slider-container" class="mastery-card w-full max-w-md bg-white rounded-b-xl shadow-lg p-6 md:p-8 min-h-[500px] flex flex-col justify-between">
   <div id="cards-wrapper"></div>
-  <div id="result-msg" class="min-h-[40px] text-center font-bold text-sm mt-2"></div>
+
+  <div class="result min-h-[60px] flex items-center justify-center text-center font-bold text-sm mt-2" id="result-msg"></div>
 
   <div class="mt-4">
     <div class="flex justify-between gap-4 mb-6">
-      <button onclick="changeSlide(-1)" class="flex-1 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold hover:bg-gray-200">Back</button>
-      <button onclick="changeSlide(1)" class="flex-1 py-3 bg-gray-800 text-white rounded-lg font-bold hover:bg-black">Next</button>
+      <button onclick="changeSlide(-1)" class="flex-1 py-4 bg-gray-100 text-gray-600 rounded-xl font-bold hover:bg-gray-200 transition-all">Back</button>
+      <button onclick="changeSlide(1)" class="flex-1 py-4 bg-gray-800 text-white rounded-xl font-bold hover:bg-black transition-all">Next</button>
     </div>
-    <div id="global-progress" class="flex justify-center gap-1.5"></div>
+    <div id="global-progress" class="flex justify-center gap-1.5 flex-wrap"></div>
   </div>
 </div>
 
-<footer class="mt-6 text-gray-400 text-xs">Jonas Way English - Mastery Method</footer>
+<footer class="mt-6 text-gray-400 text-[10px] uppercase tracking-widest text-center">Mastery Engine v5.6</footer>
 
 <script>
 let sentences = [];
-let currentIndex = Number(localStorage.getItem("jw_level3_index")) || 0;
-let slideProgress = JSON.parse(localStorage.getItem("jw_level3_progress") || "[]");
+let currentIndex = 0;
 let isRecording = false;
+let slideProgress = [];
 let recognition;
+
+const STORAGE_KEY = 'jonas_way_mastery_dynamic';
 
 fetch("https://megalab.jonasfgoes.workers.dev/")
   .then(res => res.json())
   .then(data => {
     sentences = data;
+    loadProgress();
     if (!slideProgress.length) slideProgress = new Array(sentences.length).fill(0);
     init();
   });
 
-function saveState() {
-  localStorage.setItem("jw_level3_progress", JSON.stringify(slideProgress));
-  localStorage.setItem("jw_level3_index", currentIndex);
+function saveProgress() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ currentIndex, slideProgress }));
+}
+
+function loadProgress() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    const data = JSON.parse(saved);
+    currentIndex = data.currentIndex || 0;
+    slideProgress = data.slideProgress || [];
+  }
 }
 
 function init() {
-  const wrapper = document.getElementById("cards-wrapper");
-  const globalProgress = document.getElementById("global-progress");
-  wrapper.innerHTML = "";
-  globalProgress.innerHTML = "";
+  const wrapper = document.getElementById('cards-wrapper');
+  const globalProgress = document.getElementById('global-progress');
+  wrapper.innerHTML = '';
+  globalProgress.innerHTML = '';
 
-  sentences.forEach((item,i)=>{
-    const card=document.createElement("div");
-    card.className=`card ${i===currentIndex?"active":""} text-center`;
-    card.innerHTML=`
+  sentences.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = `card ${i === currentIndex ? 'active' : ''} text-center`;
+    card.innerHTML = `
       <span class="grammar-tag type-${item.type.toLowerCase()}">${item.type}</span>
-      <h2 class="text-3xl font-bold text-gray-800 mt-2 mb-2">${item.en}</h2>
-      <p class="text-xl text-blue-600 italic mb-1">${item.phonetic}</p>
-      <p class="text-gray-400 text-sm mb-6">${item.pt}</p>
+      <h2 class="text-3xl font-bold text-gray-800 mt-2 mb-2 leading-tight">${item.en}</h2>
+      <p class="text-xl text-blue-600 font-medium italic mb-1">${item.phonetic}</p>
+      <p class="text-gray-400 mb-8 text-sm">${item.pt}</p>
 
-      <div class="flex justify-center gap-3 mb-8">
+      <div class="flex justify-center gap-4 mb-10">
         <div id="step-${i}-1" class="step-dot"></div>
         <div id="step-${i}-2" class="step-dot"></div>
         <div id="step-${i}-3" class="step-dot"></div>
       </div>
 
       <div class="flex justify-center items-center gap-6">
-        <button onclick="playAudio('${item.en}',0.6)" class="w-12 h-12 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center hover:bg-orange-100">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path d="M12 7v5l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0" />
-          </svg>
-        </button>
-
-        <button onclick="playAudio('${item.en}',1)" class="w-20 h-20 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg hover:bg-blue-700">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
-          </svg>
-        </button>
-
-        <button onclick="toggleRecording()" class="w-16 h-16 rounded-full bg-red-100 text-red-600 flex items-center justify-center hover:bg-red-200">
-          <span id="mic-icon-${i}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-            </svg>
-          </span>
+        <button onclick="playAudio('${item.en}',0.5)" class="w-14 h-14 bg-orange-50 text-orange-500 rounded-full flex items-center justify-center shadow-sm">🐢</button>
+        <button onclick="playAudio('${item.en}',1)" class="w-24 h-24 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-xl">▶️</button>
+        <button onclick="toggleRecording()" class="w-20 h-20 bg-red-50 text-red-600 rounded-full flex items-center justify-center shadow-sm">
+          <span id="mic-icon-${i}">🎤</span>
         </button>
       </div>
     `;
     wrapper.appendChild(card);
 
-    const d=document.createElement("div");
-    d.className="h-1 w-3 rounded-full bg-gray-200";
-    globalProgress.appendChild(d);
+    const dot = document.createElement('div');
+    dot.className = 'h-1 w-3 rounded-full bg-gray-200 transition-all duration-300';
+    globalProgress.appendChild(dot);
   });
 
   setupSpeechRecognition();
-  restoreProgress();
+  restoreDots();
   updateUI();
 }
 
-function restoreProgress(){
-  slideProgress.forEach((v,i)=>{
-    for(let s=1;s<=v;s++){
-      const el=document.getElementById(`step-${i}-${s}`);
-      if(el) el.classList.add("active");
+function restoreDots() {
+  slideProgress.forEach((p,i)=>{
+    for(let s=1;s<=p;s++){
+      const d=document.getElementById(`step-${i}-${s}`);
+      if(d) d.classList.add('active');
     }
   });
 }
@@ -137,59 +148,72 @@ function restoreProgress(){
 function playAudio(text,rate){
   speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(text);
-  u.lang="en-US";
+  u.lang='en-US';
   u.rate=rate;
   speechSynthesis.speak(u);
 }
 
 function setupSpeechRecognition(){
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) return alert("Chrome required.");
-
-  recognition = new SR();
-  recognition.lang="en-US";
-
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR) return alert("Chrome required.");
+  recognition=new SR();
+  recognition.lang='en-US';
   recognition.onstart=()=>{
     isRecording=true;
-    document.getElementById(`mic-icon-${currentIndex}`).classList.add("recording-pulse");
-    document.getElementById("result-msg").innerText="Listening...";
+    document.getElementById(`mic-icon-${currentIndex}`).classList.add('recording-pulse');
+    document.getElementById('result-msg').innerText='Listening...';
   };
-
   recognition.onend=()=>{
     isRecording=false;
-    document.getElementById(`mic-icon-${currentIndex}`).classList.remove("recording-pulse");
+    document.getElementById(`mic-icon-${currentIndex}`).classList.remove('recording-pulse');
   };
-
   recognition.onresult=e=>checkPronunciation(e.results[0][0].transcript);
 }
 
 function toggleRecording(){
-  if (isRecording) recognition.stop();
-  else recognition.start();
+  isRecording ? recognition.stop() : recognition.start();
 }
 
 function checkPronunciation(spoken){
-  const target = sentences[currentIndex].en;
-  const score = calculateSimilarity(spoken.toLowerCase(), target.toLowerCase());
-  const msg = document.getElementById("result-msg");
+  const target=sentences[currentIndex].en;
+  const score=calculateSimilarity(spoken.toLowerCase(),target.toLowerCase());
+  const msg=document.getElementById('result-msg');
+  const card=document.getElementById('slider-container');
 
-  if (score >= 0.6) {
-    if (slideProgress[currentIndex] < 3) {
+  if(score>=0.6){
+    if(slideProgress[currentIndex]<3){
       slideProgress[currentIndex]++;
-      document.getElementById(`step-${currentIndex}-${slideProgress[currentIndex]}`).classList.add("active");
-      saveState();
-    }
-    msg.innerHTML = `<span class="text-green-500">✅ Success (${Math.round(score*100)}%): "${spoken}"</span>`;
-  } else {
-    msg.innerHTML = `❌ Try again (${Math.round(score*100)}%): "${spoken}"`;
-  }
+      const d=document.getElementById(`step-${currentIndex}-${slideProgress[currentIndex]}`);
+      d.classList.add('active','pop-success');
 
+      if(slideProgress[currentIndex]===3){
+        card.classList.add('mastery-achieved');
+        msg.innerHTML=`<div class="mastery-text text-amber-600 text-xl font-bold">⭐ Well done!</div>`;
+        playMasterySound();
+      } else {
+        msg.innerHTML=`<span class="text-green-500 font-semibold">✅ Good! (${Math.round(score*100)}%)</span>`;
+      }
+      saveProgress();
+    }
+  } else {
+    msg.innerHTML=`<span class="text-red-500 font-medium">❌ Try again<br><span class="text-xs text-gray-400">"You said: ${spoken}"</span></span>`;
+  }
   updateUI();
 }
 
+function playMasterySound(){
+  const ctx=new (window.AudioContext||window.webkitAudioContext)();
+  const o=ctx.createOscillator();
+  const g=ctx.createGain();
+  o.connect(g); g.connect(ctx.destination);
+  o.frequency.value=523.25;
+  g.gain.value=0.05;
+  o.start(); o.stop(ctx.currentTime+0.3);
+}
+
 function calculateSimilarity(a,b){
-  a=a.replace(/[^\w\s]/g,"").trim();
-  b=b.replace(/[^\w\s]/g,"").trim();
+  a=a.replace(/[^\w\s]/g,'').trim();
+  b=b.replace(/[^\w\s]/g,'').trim();
   const costs=[];
   for(let i=0;i<=a.length;i++){
     let last=i;
@@ -198,8 +222,7 @@ function calculateSimilarity(a,b){
       else if(j>0){
         let v=costs[j-1];
         if(a[i-1]!==b[j-1]) v=Math.min(v,last,costs[j])+1;
-        costs[j-1]=last;
-        last=v;
+        costs[j-1]=last; last=v;
       }
     }
     if(i>0) costs[b.length]=last;
@@ -208,27 +231,26 @@ function calculateSimilarity(a,b){
 }
 
 function updateUI(){
-  document.querySelectorAll(".card").forEach((c,i)=>c.classList.toggle("active",i===currentIndex));
-  document.querySelectorAll("#global-progress div").forEach((d,i)=>{
-    d.className=`h-1 w-3 rounded-full ${i===currentIndex?"bg-gray-800 w-6":slideProgress[i]===3?"bg-green-500":"bg-gray-200"}`;
+  document.querySelectorAll('.card').forEach((c,i)=>c.classList.toggle('active',i===currentIndex));
+  document.querySelectorAll('#global-progress div').forEach((d,i)=>{
+    d.className=`h-1 w-3 rounded-full transition-all duration-300 ${i===currentIndex?'bg-gray-800 w-6':slideProgress[i]===3?'bg-amber-400':'bg-gray-200'}`;
   });
-  document.getElementById("counter").innerText=`Card ${currentIndex+1} of ${sentences.length}`;
-  saveState();
+  document.getElementById('counter').innerText=`Card ${currentIndex+1} of ${sentences.length}`;
 }
 
 function changeSlide(dir){
   currentIndex=(currentIndex+dir+sentences.length)%sentences.length;
-  document.getElementById("result-msg").innerText="";
+  document.getElementById('result-msg').innerText='';
+  saveProgress();
   updateUI();
 }
 
 function confirmReset(){
-  if(confirm("Reset everything?")){
-    localStorage.clear();
+  if(confirm("Deseja apagar TODO o seu progresso?")){
+    localStorage.removeItem(STORAGE_KEY);
     location.reload();
   }
 }
 </script>
-
 </body>
 </html>
