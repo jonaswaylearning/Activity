@@ -184,32 +184,35 @@ function checkPronunciation(spokenText) {
     const cardContainer = document.getElementById('slider-container');
     const displaySpoken = `"${spokenText}"`;
 
-    if (score >= 0.6) {
+    if (score >= 0.75) {
+
+        // ✅ Progress only if not mastered yet
         if (slideProgress[currentIndex] < 3) {
             slideProgress[currentIndex]++;
-            const currentDot = document.getElementById(`step-${currentIndex}-${slideProgress[currentIndex]}`);
+            const currentDot = document.getElementById(
+                `step-${currentIndex}-${slideProgress[currentIndex]}`
+            );
             currentDot.classList.add('active', 'pop-success');
 
             if (slideProgress[currentIndex] === 3) {
                 cardContainer.classList.add('mastery-achieved');
-                msg.innerHTML = `
-                  <div class="feedback-entry">
-                    <div class="text-amber-600 text-2xl font-bold">⭐ Well done!</div>
-                    <div class="text-amber-500 font-medium italic mt-1 text-lg">${displaySpoken}</div>
-                  </div>`;
                 playMasterySound();
-            } else {
-                msg.innerHTML = `
-                  <div class="feedback-entry">
-                    <div class="text-green-500 text-xl font-bold">✅ ${displaySpoken}</div>
-                    <div class="text-gray-400 text-[10px] uppercase tracking-widest mt-1">
-                      Matched with ${Math.round(score * 100)}% accuracy
-                    </div>
-                  </div>`;
             }
+
             saveProgress();
         }
+
+        // ✅ Feedback ALWAYS shown
+        msg.innerHTML = `
+          <div class="feedback-entry">
+            <div class="text-green-500 text-xl font-bold">✅ ${displaySpoken}</div>
+            <div class="text-gray-400 text-[10px] uppercase tracking-widest mt-1">
+              Matched with ${Math.round(score * 100)}% accuracy
+            </div>
+          </div>`;
+
     } else {
+        // ❌ Failure feedback always shown
         msg.innerHTML = `
           <div class="feedback-entry">
             <div class="text-red-500 text-xl font-bold">❌ ${displaySpoken}</div>
@@ -218,6 +221,7 @@ function checkPronunciation(spokenText) {
             </div>
           </div>`;
     }
+
     updateUI();
 }
 
