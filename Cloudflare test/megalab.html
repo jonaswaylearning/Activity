@@ -161,13 +161,28 @@ function setupSpeechRecognition(){
 function toggleRecording(){ isRecording?recognition.stop():recognition.start(); }
 
 function checkPronunciation(spoken){
-  const target=sentences[currentIndex].en;
-  const score=calculateSimilarity(spoken.toLowerCase(),target.toLowerCase());
-  if(score>=0.6 && slideProgress[currentIndex]<3){
-    slideProgress[currentIndex]++;
-    document.getElementById(`step-${currentIndex}-${slideProgress[currentIndex]}`).classList.add("active");
-    saveState();
+  const target = sentences[currentIndex].en;
+  const score = calculateSimilarity(
+    spoken.toLowerCase(),
+    target.toLowerCase()
+  );
+
+  const msg = document.getElementById("result-msg");
+
+  if (score >= 0.6) {
+    if (slideProgress[currentIndex] < 3) {
+      slideProgress[currentIndex]++;
+      document
+        .getElementById(`step-${currentIndex}-${slideProgress[currentIndex]}`)
+        .classList.add("active");
+      saveState();
+    }
+
+    msg.innerHTML = `✅ Success (${Math.round(score*100)}%): "${spoken}"`;
+  } else {
+    msg.innerHTML = `❌ Try again (${Math.round(score*100)}%): "${spoken}"`;
   }
+
   updateUI();
 }
 
