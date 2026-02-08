@@ -147,6 +147,8 @@ function restoreDots() {
 }
 
 function playAudio(text, rate) {
+    if (isRecording) return; // 🚫 bloqueia TTS enquanto o mic está ativo
+
     speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-US';
@@ -299,4 +301,5 @@ function confirmReset() {
 </script>
 </body>
 </html>
+
 
