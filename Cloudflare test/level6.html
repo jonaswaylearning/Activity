@@ -292,9 +292,21 @@ function changeSlide(dir) {
 }
 
 function confirmReset() {
-    if (confirm("Deseja apagar TODO o seu progresso?")) {
-        localStorage.removeItem(STORAGE_KEY);
-        window.location.reload();
+    if (confirm("Deseja apagar o progresso DESTE card?")) {
+
+        // reset data
+        slideProgress[currentIndex] = 0;
+
+        // clear dots visually for current card
+        for (let step = 1; step <= 3; step++) {
+            const dot = document.getElementById(`step-${currentIndex}-${step}`);
+            if (dot) dot.classList.remove('active', 'pop-success');
+        }
+
+        document.getElementById('result-msg').innerText = "";
+
+        saveProgress();
+        updateUI();
     }
 }
 </script>
