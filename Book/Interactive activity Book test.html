@@ -1,0 +1,277 @@
+# Try writing the file again after the state reset
+from pathlib import Path
+
+html = """<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chapter 7 – Farm Animals • Áudio + Pronúncia com microfone</title>
+<style>
+  :root{
+    --bg:#f7fafc; --card:#ffffff; --ink:#0f172a; --muted:#475569;
+    --shadow:0 8px 24px rgba(2,6,23,.08); --radius:18px;
+    --chip:#fee2e2; --accent:#ef4444; --green:#059669; --amber:#b45309; --red:#b91c1c;
+  }
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:980px;margin:24px auto;padding:20px}
+  .hero{background:linear-gradient(135deg,#ffe4e6,#dcfce7);
+    padding:22px;border-radius:var(--radius);box-shadow:var(--shadow);
+    display:flex;justify-content:space-between;align-items:center;gap:16px}
+  h1{margin:0;font-size:clamp(20px,3.5vw,30px)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{background:var(--chip);color:#991b1b;border-radius:999px;
+    padding:6px 12px;font-weight:700;font-size:13px}
+  .section{margin-top:18px}
+  .card{background:var(--card);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:18px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+  .item{display:flex;gap:12px;padding:12px;border-radius:14px}
+  .emoji{font-size:28px;min-width:34px;text-align:center}
+  .entry{flex:1}
+  .en{font-weight:800}
+  .pt{color:var(--muted)}
+  .pr{color:#0f766e;font-weight:700;letter-spacing:.2px}
+  .ex{margin-top:8px;padding:10px;border-radius:12px;background:#f1f5f9}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .btn{border:0;padding:8px 10px;border-radius:999px;background:#fef2f2;color:#991b1b;cursor:pointer;box-shadow:var(--shadow);font-weight:700}
+  .btn.secondary{background:#ecfeff;color:#155e75}
+  .btn.mic{background:#dcfce7;color:#065f46}
+  .btn.stop{background:#fee2e2;color:#7f1d1d}
+  .result{margin-top:8px;font-size:14px}
+  .score{font-weight:800}
+  .ok{color:var(--green)} .mid{color:var(--amber)} .bad{color:var(--red)}
+  .footer{margin:28px 4px;color:var(--muted);font-size:13px;text-align:center}
+  .help{font-size:13px;color:#374151;margin-top:10px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div>
+        <h1>🐮 Chapter 7 – Farm Animals</h1>
+        <p>Agora com <strong>áudio</strong> (🔊) e <strong>exercícios de pronúncia</strong> pelo microfone (🎙️). O navegador faz o reconhecimento e calcula um índice de similaridade com a palavra/frase‑alvo.</p>
+        <p class="help">Se possível, ative uma <u>voz inglesa</u> nas configurações do navegador. Permita o uso do microfone quando solicitado.</p>
+      </div>
+      <div class="chips" aria-hidden="true">
+        <span class="chip">Audio</span>
+        <span class="chip">Microphone</span>
+        <span class="chip">Scoring</span>
+      </div>
+    </section>
+
+    <section class="section card">
+      <div class="grid">
+        <div class="item" data-term="horse" data-sent="This is a horse.">
+          <div class="emoji">🐴</div>
+          <div class="entry">
+            <div class="en">horse</div>
+            <div class="pt">cavalo</div>
+            <div class="pr">/hórs/</div>
+            <div class="ex"><strong>Sentence:</strong> This is a horse.</div>
+            <div class="controls">
+              <button class="btn" onclick="speakTerm(this)">🔊 Term</button>
+              <button class="btn secondary" onclick="speakSentence(this)">🔊 Sentence</button>
+              <button class="btn mic" onclick="startCheck(this, 'term')">🎙️ Say term</button>
+              <button class="btn mic" onclick="startCheck(this, 'sent')">🎙️ Say sentence</button>
+              <button class="btn stop" onclick="stopRec()">⏹ Stop</button>
+            </div>
+            <div class="result"></div>
+          </div>
+        </div>
+
+        <div class="item" data-term="cow" data-sent="This is a cow.">
+          <div class="emoji">🐄</div>
+          <div class="entry">
+            <div class="en">cow</div>
+            <div class="pt">vaca</div>
+            <div class="pr">/káu/</div>
+            <div class="ex"><strong>Sentence:</strong> This is a cow.</div>
+            <div class="controls">
+              <button class="btn" onclick="speakTerm(this)">🔊 Term</button>
+              <button class="btn secondary" onclick="speakSentence(this)">🔊 Sentence</button>
+              <button class="btn mic" onclick="startCheck(this, 'term')">🎙️ Say term</button>
+              <button class="btn mic" onclick="startCheck(this, 'sent')">🎙️ Say sentence</button>
+              <button class="btn stop" onclick="stopRec()">⏹ Stop</button>
+            </div>
+            <div class="result"></div>
+          </div>
+        </div>
+
+        <div class="item" data-term="duck" data-sent="This is a duck.">
+          <div class="emoji">🦆</div>
+          <div class="entry">
+            <div class="en">duck</div>
+            <div class="pt">pato</div>
+            <div class="pr">/dâk/</div>
+            <div class="ex"><strong>Sentence:</strong> This is a duck.</div>
+            <div class="controls">
+              <button class="btn" onclick="speakTerm(this)">🔊 Term</button>
+              <button class="btn secondary" onclick="speakSentence(this)">🔊 Sentence</button>
+              <button class="btn mic" onclick="startCheck(this, 'term')">🎙️ Say term</button>
+              <button class="btn mic" onclick="startCheck(this, 'sent')">🎙️ Say sentence</button>
+              <button class="btn stop" onclick="stopRec()">⏹ Stop</button>
+            </div>
+            <div class="result"></div>
+          </div>
+        </div>
+
+        <div class="item" data-term="hen" data-sent="This is a hen.">
+          <div class="emoji">🐔</div>
+          <div class="entry">
+            <div class="en">hen</div>
+            <div class="pt">galinha</div>
+            <div class="pr">/hén/</div>
+            <div class="ex"><strong>Sentence:</strong> This is a hen.</div>
+            <div class="controls">
+              <button class="btn" onclick="speakTerm(this)">🔊 Term</button>
+              <button class="btn secondary" onclick="speakSentence(this)">🔊 Sentence</button>
+              <button class="btn mic" onclick="startCheck(this, 'term')">🎙️ Say term</button>
+              <button class="btn mic" onclick="startCheck(this, 'sent')">🎙️ Say sentence</button>
+              <button class="btn stop" onclick="stopRec()">⏹ Stop</button>
+            </div>
+            <div class="result"></div>
+          </div>
+        </div>
+
+        <div class="item" data-term="rooster" data-sent="This is a rooster.">
+          <div class="emoji">🐓</div>
+          <div class="entry">
+            <div class="en">rooster</div>
+            <div class="pt">galo</div>
+            <div class="pr">/rú-ster/</div>
+            <div class="ex"><strong>Sentence:</strong> This is a rooster.</div>
+            <div class="controls">
+              <button class="btn" onclick="speakTerm(this)">🔊 Term</button>
+              <button class="btn secondary" onclick="speakSentence(this)">🔊 Sentence</button>
+              <button class="btn mic" onclick="startCheck(this, 'term')">🎙️ Say term</button>
+              <button class="btn mic" onclick="startCheck(this, 'sent')">🎙️ Say sentence</button>
+              <button class="btn stop" onclick="stopRec()">⏹ Stop</button>
+            </div>
+            <div class="result"></div>
+          </div>
+        </div>
+
+        <div class="item" data-term="sheep" data-sent="This is a sheep.">
+          <div class="emoji">🐑</div>
+          <div class="entry">
+            <div class="en">sheep</div>
+            <div class="pt">ovelha</div>
+            <div class="pr">/xíp/</div>
+            <div class="ex"><strong>Sentence:</strong> This is a sheep.</div>
+            <div class="controls">
+              <button class="btn" onclick="speakTerm(this)">🔊 Term</button>
+              <button class="btn secondary" onclick="speakSentence(this)">🔊 Sentence</button>
+              <button class="btn mic" onclick="startCheck(this, 'term')">🎙️ Say term</button>
+              <button class="btn mic" onclick="startCheck(this, 'sent')">🎙️ Say sentence</button>
+              <button class="btn stop" onclick="stopRec()">⏹ Stop</button>
+            </div>
+            <div class="result"></div>
+          </div>
+        </div>
+
+        <div class="item" data-term="pig" data-sent="This is a pig.">
+          <div class="emoji">🐷</div>
+          <div class="entry">
+            <div class="en">pig</div>
+            <div class="pt">porco</div>
+            <div class="pr">/píg/</div>
+            <div class="ex"><strong>Sentence:</strong> This is a pig.</div>
+            <div class="controls">
+              <button class="btn" onclick="speakTerm(this)">🔊 Term</button>
+              <button class="btn secondary" onclick="speakSentence(this)">🔊 Sentence</button>
+              <button class="btn mic" onclick="startCheck(this, 'term')">🎙️ Say term</button>
+              <button class="btn mic" onclick="startCheck(this, 'sent')">🎙️ Say sentence</button>
+              <button class="btn stop" onclick="stopRec()">⏹ Stop</button>
+            </div>
+            <div class="result"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <p class="footer">Reconhecimento de voz feito pelo navegador (Web Speech Recognition). O placar usa similaridade de texto (distância de Levenshtein) após normalização.</p>
+  </div>
+
+<script>
+  function getEnglishVoice(){
+    const voices = window.speechSynthesis.getVoices();
+    const preferred = voices.find(v => /en[-_](US|GB)/i.test(v.lang)) || voices.find(v => /^en/i.test(v.lang)) || voices[0];
+    return preferred;
+  }
+  function speak(text){
+    if(!('speechSynthesis' in window)) { alert('Speech not supported in this browser.'); return; }
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 0.95; u.pitch = 1; u.volume = 1;
+    u.voice = getEnglishVoice();
+    window.speechSynthesis.speak(u);
+  }
+  function speakTerm(btn){ const item = btn.closest('.item'); speak(item.dataset.term); }
+  function speakSentence(btn){ const item = btn.closest('.item'); speak(item.dataset.sent); }
+  if (speechSynthesis.onvoiceschanged !== undefined) { speechSynthesis.onvoiceschanged = () => {}; }
+
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recog = null, currentItem = null, currentMode = 'term';
+
+  function startCheck(btn, mode){
+    if(!SR){ alert('Speech Recognition is not supported in this browser. Try Chrome on desktop/Android or Edge.'); return; }
+    stopRec();
+    currentMode = mode;
+    currentItem = btn.closest('.item');
+    const target = mode === 'term' ? currentItem.dataset.term : currentItem.dataset.sent;
+    const res = currentItem.querySelector('.result');
+    res.innerHTML = '🎧 Listening… Speak now.';
+    recog = new SR();
+    recog.lang = 'en-US';
+    recog.interimResults = false;
+    recog.maxAlternatives = 3;
+    recog.onresult = (e)=>{
+      const heard = (e.results[0][0].transcript || '').trim();
+      const score = similarity(normalize(heard), normalize(target));
+      const pct = Math.round(score*100);
+      let cls = 'bad', msg = 'Try again.';
+      if(score>=0.8){ cls='ok'; msg='Great!'; }
+      else if(score>=0.6){ cls='mid'; msg='Good try. Focus on the vowels.'; }
+      res.innerHTML = `You said: "<strong>${heard}</strong>"<br/>Target: "<strong>${target}</strong>"<br/><span class="score ${cls}">Score: ${pct}% – ${msg}</span>`;
+    };
+    recog.onerror = (e)=>{ res.innerHTML = '⚠️ Error: ' + (e.error||'unknown'); };
+    recog.onend = ()=>{ /* finished */ };
+    recog.start();
+  }
+  function stopRec(){ if(recog){ try{recog.stop();}catch{} recog=null; } }
+
+  function normalize(s){
+    return (s||'').toLowerCase()
+      .replace(/[^a-z\\s]/g,'')
+      .replace(/\\b(a|an|the)\\b/g,'')
+      .replace(/\\s+/g,' ').trim();
+  }
+  function levenshtein(a,b){
+    const m=a.length, n=b.length;
+    if(m===0) return n; if(n===0) return m;
+    const dp = Array.from({length:m+1}, (_,i)=>Array(n+1).fill(0));
+    for(let i=0;i<=m;i++) dp[i][0]=i;
+    for(let j=0;j<=n;j++) dp[0][j]=j;
+    for(let i=1;i<=m;i++){
+      for(let j=1;j<=n;j++){
+        const cost = a[i-1]===b[j-1]?0:1;
+        dp[i][j] = Math.min(dp[i-1][j]+1, dp[i][j-1]+1, dp[i-1][j-1]+cost);
+      }
+    }
+    return dp[m][n];
+  }
+  function similarity(s1,s2){
+    if(!s1 && !s2) return 1;
+    const dist = levenshtein(s1, s2);
+    const maxLen = Math.max(s1.length, s2.length) || 1;
+    return 1 - dist / maxLen;
+  }
+</script>
+</body>
+</html>"""
+
+p = Path("/mnt/data/ch7_farm_animals_speech_practice.html")
+p.write_text(html, encoding="utf-8")
+str(p)

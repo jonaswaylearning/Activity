@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Capítulos 1–8 — Prática Interativa 🎧</title>
+<style>
+  :root{--bg:#f7f7f8;--card:#fff;--muted:#666;--accent:#111;--green:#0a8f3c}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--accent);margin:0;padding:22px}
+  .container{max-width:820px;margin:0 auto}
+  h1{font-size:20px;margin:0 0 6px}
+  p.lead{margin:6px 0 18px;color:var(--muted)}
+  .card{background:var(--card);border-radius:12px;padding:12px 14px;margin:12px 0;box-shadow:0 6px 20px rgba(0,0,0,0.04)}
+  .meta{font-size:13px;color:var(--muted);margin-bottom:6px}
+  .pt{font-size:16px;margin:0 0 6px;color:#333}
+  .en{font-weight:700;margin:0 0 6px;color:#111}
+  .translit{font-style:italic;margin:0 0 10px;color:#555}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  button{background:#111;color:#fff;border:0;padding:8px 10px;border-radius:8px;font-weight:600;cursor:pointer}
+  .small{font-size:13px;padding:6px 8px;border-radius:6px}
+  .result{margin-top:8px;font-size:14px;min-height:20px}
+  .score{font-weight:700;color:var(--bg)} /* hidden */
+  footer{color:var(--muted);font-size:13px;margin-top:18px}
+  .progress{display:flex;gap:6px;margin-top:10px}
+  .progress .step{flex:1;height:10px;border-radius:6px;background:#eee}
+  .progress .step.filled{background:var(--green)}
+  .badge-done{margin-left:8px;font-weight:700;color:var(--green)}
+  .reset.small{background:#111;color:#fff;border:0;padding:6px 8px;border-radius:6px;font-weight:600;cursor:pointer}
+  @media (prefers-color-scheme: dark){:root{--bg:#0f1112;--card:#0e1112;--muted:#9aa0a6;--accent:#e6e6e6} .pt{color:#e6e6e6} .en{color:#fff} .translit{color:#cfcfcf}}
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Capítulos 1–8 — Prática</h1>
+    <p class="lead">Click ▶️ to hear the original line, 🐢 to hear it slower, and 🔴 to record your pronunciation for feedback. — have fun! 😊</p>
+
+    <!-- 1 -->
+    <div class="card" data-idx="1">
+      <div class="meta">Chap 1</div>
+      <div class="pt">Este é um dinossauro vermelho.</div>
+      <div class="en">This is a red dinosaur.</div>
+      <div class="translit">dhis iz â réd dainôsôr</div>
+      <div class="row">
+        <button class="play small" data-text="This is a red dinosaur.">▶️ Play</button>
+        <button class="slow small" data-text="This is a red dinosaur.">🐢 Slow</button>
+        <button class="rec small" data-text="This is a red dinosaur.">🔴 Record</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div class="step" data-step="1"></div><div class="step" data-step="2"></div><div class="step" data-step="3"></div><div class="step" data-step="4"></div><div class="badge-done"></div></div>
+      <div style="margin-top:8px;text-align:right;"><button class="reset small" data-idx="1">🔁 Reset</button></div>
+      <div class="result" aria-live="polite"></div>
+    </div>
+
+    <!-- 2 -->
+    <div class="card" data-idx="2">
+      <div class="meta">Chap 2</div>
+      <div class="pt">Eu vejo dois pássaros azuis.</div>
+      <div class="en">I see two blue birds.</div>
+      <div class="translit">ai sí tchú tú blú bérdz</div>
+      <div class="row">
+        <button class="play small" data-text="I see two blue birds.">▶️ Play</button>
+        <button class="slow small" data-text="I see two blue birds.">🐢 Slow</button>
+        <button class="rec small" data-text="I see two blue birds.">🔴 Record</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div class="step" data-step="1"></div><div class="step" data-step="2"></div><div class="step" data-step="3"></div><div class="step" data-step="4"></div><div class="badge-done"></div></div>
+      <div style="margin-top:8px;text-align:right;"><button class="reset small" data-idx="2">🔁 Reset</button></div>
+      <div class="result"></div>
+    </div>
+
+    <!-- 3 -->
+    <div class="card" data-idx="3">
+      <div class="meta">Chap 3</div>
+      <div class="pt">Vamos cantar a canção dos números.</div>
+      <div class="en">Let's sing the big number song.</div>
+      <div class="translit">lêts síng dhi bíg nâmber sông</div>
+      <div class="row">
+        <button class="play small" data-text="Let's sing the big number song.">▶️ Play</button>
+        <button class="slow small" data-text="Let's sing the big number song.">🐢 Slow</button>
+        <button class="rec small" data-text="Let's sing the big number song.">🔴 Record</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div class="step" data-step="1"></div><div class="step" data-step="2"></div><div class="step" data-step="3"></div><div class="step" data-step="4"></div><div class="badge-done"></div></div>
+      <div style="margin-top:8px;text-align:right;"><button class="reset small" data-idx="3">🔁 Reset</button></div>
+      <div class="result"></div>
+    </div>
+
+    <!-- 4 -->
+    <div class="card" data-idx="4">
+      <div class="meta">Chap 4</div>
+      <div class="pt">Desenhe um pássaro com cores do arco-íris.</div>
+      <div class="en">Draw a bird with rainbow colors.</div>
+      <div class="translit">drôu â bérd uith réinbôu cólers</div>
+      <div class="row">
+        <button class="play small" data-text="Draw a bird with rainbow colors.">▶️ Play</button>
+        <button class="slow small" data-text="Draw a bird with rainbow colors.">🐢 Slow</button>
+        <button class="rec small" data-text="Draw a bird with rainbow colors.">🔴 Record</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div class="step" data-step="1"></div><div class="step" data-step="2"></div><div class="step" data-step="3"></div><div class="step" data-step="4"></div><div class="badge-done"></div></div>
+      <div style="margin-top:8px;text-align:right;"><button class="reset small" data-idx="4">🔁 Reset</button></div>
+      <div class="result"></div>
+    </div>
+
+    <!-- 5 -->
+    <div class="card" data-idx="5">
+      <div class="meta">Chap 5</div>
+      <div class="pt">Eu tenho um amigo na escola.</div>
+      <div class="en">I have a friend at school.</div>
+      <div class="translit">ai rév â frend át skóol</div>
+      <div class="row">
+        <button class="play small" data-text="I have a friend at school.">▶️ Play</button>
+        <button class="slow small" data-text="I have a friend at school.">🐢 Slow</button>
+        <button class="rec small" data-text="I have a friend at school.">🔴 Record</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div class="step" data-step="1"></div><div class="step" data-step="2"></div><div class="step" data-step="3"></div><div class="step" data-step="4"></div><div class="badge-done"></div></div>
+      <div style="margin-top:8px;text-align:right;"><button class="reset small" data-idx="5">🔁 Reset</button></div>
+      <div class="result"></div>
+    </div>
+
+    <!-- 6 -->
+    <div class="card" data-idx="6">
+      <div class="meta">Chap 6</div>
+      <div class="pt">Quantos dinossauros você vê?</div>
+      <div class="en">How many dinosaurs do you see?</div>
+      <div class="translit">ráu méni dainôsôrz dú iú sí</div>
+      <div class="row">
+        <button class="play small" data-text="How many dinosaurs do you see?">▶️ Play</button>
+        <button class="slow small" data-text="How many dinosaurs do you see?">🐢 Slow</button>
+        <button class="rec small" data-text="How many dinosaurs do you see?">🔴 Record</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div class="step" data-step="1"></div><div class="step" data-step="2"></div><div class="step" data-step="3"></div><div class="step" data-step="4"></div><div class="badge-done"></div></div>
+      <div style="margin-top:8px;text-align:right;"><button class="reset small" data-idx="6">🔁 Reset</button></div>
+      <div class="result"></div>
+    </div>
+
+    <!-- 7 -->
+    <div class="card" data-idx="7">
+      <div class="meta">Chap 7</div>
+      <div class="pt">Eu gosto de suco.</div>
+      <div class="en">I like juice.</div>
+      <div class="translit">ai láik dzhúis</div>
+      <div class="row">
+        <button class="play small" data-text="I like juice.">▶️ Play</button>
+        <button class="slow small" data-text="I like juice.">🐢 Slow</button>
+        <button class="rec small" data-text="I like juice.">🔴 Record</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div class="step" data-step="1"></div><div class="step" data-step="2"></div><div class="step" data-step="3"></div><div class="step" data-step="4"></div><div class="badge-done"></div></div>
+      <div style="margin-top:8px;text-align:right;"><button class="reset small" data-idx="7">🔁 Reset</button></div>
+      <div class="result"></div>
+    </div>
+
+    <!-- 8 -->
+    <div class="card" data-idx="8">
+      <div class="meta">Chap 8</div>
+      <div class="pt">Pegue o lápis, por favor.</div>
+      <div class="en">Please get the pencil.</div>
+      <div class="translit">plíz guét dhi pénsâl</div>
+      <div class="row">
+        <button class="play small" data-text="Please get the pencil.">▶️ Play</button>
+        <button class="slow small" data-text="Please get the pencil.">🐢 Slow</button>
+        <button class="rec small" data-text="Please get the pencil.">🔴 Record</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div class="step" data-step="1"></div><div class="step" data-step="2"></div><div class="step" data-step="3"></div><div class="step" data-step="4"></div><div class="badge-done"></div></div>
+      <div style="margin-top:8px;text-align:right;"><button class="reset small" data-idx="8">🔁 Reset</button></div>
+      <div class="result"></div>
+    </div>
+
+    <!-- 9 -->
+    <div class="card" data-idx="9">
+      <div class="meta">Chap 7–8</div>
+      <div class="pt">A cadeira é vermelha.</div>
+      <div class="en">The chair is red.</div>
+      <div class="translit">dhi tchéer iz réd</div>
+      <div class="row">
+        <button class="play small" data-text="The chair is red.">▶️ Play</button>
+        <button class="slow small" data-text="The chair is red.">🐢 Slow</button>
+        <button class="rec small" data-text="The chair is red.">🔴 Record</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div class="step" data-step="1"></div><div class="step" data-step="2"></div><div class="step" data-step="3"></div><div class="step" data-step="4"></div><div class="badge-done"></div></div>
+      <div style="margin-top:8px;text-align:right;"><button class="reset small" data-idx="9">🔁 Reset</button></div>
+      <div class="result"></div>
+    </div>
+
+    <!-- 10 -->
+    <div class="card" data-idx="10">
+      <div class="meta">Chap 3</div>
+      <div class="pt">Vamos contar até cinco.</div>
+      <div class="en">Let's count to five.</div>
+      <div class="translit">lêts káunt tu faiv</div>
+      <div class="row">
+        <button class="play small" data-text="Let's count to five.">▶️ Play</button>
+        <button class="slow small" data-text="Let's count to five.">🐢 Slow</button>
+        <button class="rec small" data-text="Let's count to five.">🔴 Record</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div class="step" data-step="1"></div><div class="step" data-step="2"></div><div class="step" data-step="3"></div><div class="step" data-step="4"></div><div class="badge-done"></div></div>
+      <div style="margin-top:8px;text-align:right;"><button class="reset small" data-idx="10">🔁 Reset</button></div>
+      <div class="result"></div>
+    </div>
+
+    <footer>Best used in Chrome on Android. If mic is blocked, open the page in Chrome (⋮ → Open in Chrome). 🎧📚</footer>
+  </div>
+
+  <!-- modal -->
+  <div id="unsupportedModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);align-items:center;justify-content:center;z-index:1200">
+    <div style="background:white;padding:16px;border-radius:12px;max-width:420px;width:92%;box-shadow:0 10px 30px rgba(0,0,0,0.15);margin:40px auto;text-align:left">
+      <h3 style="margin:0 0 8px;font-size:16px">🎙️ Recording not available</h3>
+      <p style="margin:0 0 12px;color:var(--muted)">Recording isn't supported in this browser. For full functionality (Record), open this page in <strong>Chrome on Android</strong> or on a desktop Chrome browser. You can still listen to the sentences here.</p>
+      <div style="display:flex;gap:8px;justify-content:flex-end"><button onclick="hideUnsupportedModal()" style="background:#eee;color:#111;border:0;padding:8px 10px;border-radius:8px;cursor:pointer">Close</button></div>
+    </div>
+  </div>
+
+<script>
+const REQUIRED_CORRECT = 4; const PASS_THRESHOLD = 65;
+function speak(text, rate=1){ if(!('speechSynthesis' in window)) return; const u=new SpeechSynthesisUtterance(text); u.lang='en-US'; u.rate=rate; const v=speechSynthesis.getVoices().find(v=>/en/.test(v.lang)); if(v) u.voice=v; speechSynthesis.cancel(); speechSynthesis.speak(u); }
+function levenshtein(a,b){ a=a.toLowerCase(); b=b.toLowerCase(); const m=a.length,n=b.length; if(m===0) return n; if(n===0) return m; const d=Array(m+1).fill(null).map(()=>Array(n+1).fill(0)); for(let i=0;i<=m;i++) d[i][0]=i; for(let j=0;j<=n;j++) d[0][j]=j; for(let i=1;i<=m;i++){ for(let j=1;j<=n;j++){ const cost=a[i-1]===b[j-1]?0:1; d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+cost); } } return d[m][n]; }
+function scoreMatch(expected, actual){ const dist=levenshtein(expected, actual); const maxLen=Math.max(expected.length,1); const ratio=Math.max(0,1-dist/maxLen); return Math.round(ratio*100); }
+const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+function keyFor(idx){ return `chap1_8_sent_${idx}_count`; }
+function updateProgressUI(card,count){ const steps=Array.from(card.querySelectorAll('.progress .step')); steps.forEach((s,i)=>{ s.classList.remove('filled'); if(i < count) s.classList.add('filled'); }); const badge=card.querySelector('.badge-done'); if(count>=REQUIRED_CORRECT) badge.textContent='✅ Completed'; else badge.textContent=''; }
+function initProgress(){ document.querySelectorAll('.card').forEach(card=>{ const idx=card.dataset.idx; const c=parseInt(localStorage.getItem(keyFor(idx))||'0',10); updateProgressUI(card,c); }); }
+function resetProgress(idx){ localStorage.setItem(keyFor(idx),0); const card=document.querySelector(`.card[data-idx="${idx}"]`); if(card){ updateProgressUI(card,0); const res=card.querySelector('.result'); if(res) res.textContent=''; } }
+function showUnsupportedModal(){ document.getElementById('unsupportedModal').style.display='flex'; }
+function hideUnsupportedModal(){ document.getElementById('unsupportedModal').style.display='none'; }
+window.addEventListener('load', ()=>{
+  if(!Recognition){ setTimeout(showUnsupportedModal,600); }
+  document.querySelectorAll('.play').forEach(b=>b.addEventListener('click', ()=>speak(b.dataset.text,1)));
+  document.querySelectorAll('.slow').forEach(b=>b.addEventListener('click', ()=>speak(b.dataset.text,0.75)));
+  document.querySelectorAll('.reset').forEach(b=>b.addEventListener('click', ()=>{ const idx=b.dataset.idx; if(!idx) return; if(confirm('Reset progress for this sentence?')) resetProgress(idx); }));
+  document.querySelectorAll('.rec').forEach(b=>b.addEventListener('click', ()=>{
+    const card=b.closest('.card'); const res=card.querySelector('.result'); if(!Recognition){ res.textContent='SpeechRecognition not supported. Use Chrome on Android.'; return; } if(b.disabled) return; const expected=b.dataset.text; const idx=card.dataset.idx; const recog=new Recognition(); recog.lang='en-US'; recog.interimResults=false; recog.maxAlternatives=3; res.textContent='🎙️ Listening...'; try{ recog.start(); }catch(e){ res.textContent='Could not start mic.'; return; } recog.onresult = ev=>{ const transcript=ev.results[0][0].transcript; const score=scoreMatch(expected,transcript); res.innerHTML = `You said: "<em>${transcript}</em>" — ${score>=PASS_THRESHOLD? '✅ Good!':'❌ Try again'} <span class="score">${score}%</span>`; if(score>=PASS_THRESHOLD){ const prev=parseInt(localStorage.getItem(keyFor(idx))||'0',10); const now=Math.min(REQUIRED_CORRECT,prev+1); localStorage.setItem(keyFor(idx),now); updateProgressUI(card,now); } recog.stop(); };
+    recog.onerror = ev=>{ res.textContent = 'Error: '+ev.error; };
+  }));
+  initProgress();
+});
+</script>
+</body>
+</html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Capítulos 1–8 — Prática Interativa 🎧</title>
+<style>
+  :root{--bg:#f7f7f8;--card:#fff;--muted:#666;--accent:#111;--green:#0a8f3c}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:var(--bg);color:var(--accent);margin:0;padding:22px}
+  .container{max-width:820px;margin:0 auto}
+  h1{font-size:20px;margin:0 0 6px}
+  p.lead{margin:6px 0 18px;color:var(--muted)}
+  .card{background:var(--card);border-radius:12px;padding:12px 14px;margin:12px 0;box-shadow:0 6px 20px rgba(0,0,0,0.04)}
+  .meta{font-size:13px;color:var(--muted);margin-bottom:6px}
+  .pt{font-size:16px;margin:0 0 6px;color:#333}
+  .en{font-weight:700;margin:0 0 6px;color:#111}
+  .translit{font-style:italic;margin:0 0 10px;color:#555}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  button{background:#111;color:#fff;border:0;padding:8px 10px;border-radius:8px;font-weight:600;cursor:pointer}
+  .small{font-size:13px;padding:6px 8px;border-radius:6px}
+  .result{margin-top:8px;font-size:14px;min-height:20px}
+  .score{font-weight:700;color:var(--bg)} /* hidden */
+  footer{color:var(--muted);font-size:13px;margin-top:18px}
+  .progress{display:flex;gap:6px;margin-top:10px}
+  .progress .step{flex:1;height:10px;border-radius:6px;background:#eee}
+  .progress .step.filled{background:var(--green)}
+  .badge-done{margin-left:8px;font-weight:700;color:var(--green)}
+  .reset.small{background:#111;color:#fff;border:0;padding:6px 8px;border-radius:6px;font-weight:600;cursor:pointer}
+  @media (prefers-color-scheme: dark){:root{--bg:#0f1112;--card:#0e1112;--muted:#9aa0a6;--accent:#e6e6e6} .pt{color:#e6e6e6} .en{color:#fff} .translit{color:#cfcfcf}}
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Capítulos 1–8 — Prática</h1>
+    <p class="lead">Click ▶️ to hear the original line, 🐢 to hear it slower, and 🔴 to record your pronunciation for feedback. — have fun! 😊</p>
+
+    <!-- 1 -->
+    <div class="card" data-idx="1">
+      <div class="meta">Chap 1</div>
+      <div class="pt">Este é um dinossauro vermelho.</div>
+      <div class="en">This is a red dinosaur.</div>
+      <div class="translit">dhis iz â réd dainôsôr</div>
+      <div class="row">
+        <button class="play small" data-text="This is a red dinosaur.">▶️ Play</button>
+        <button class="slow small" data-text="This is a red dinosaur.">🐢 Slow</button>
+        <button class="rec small" data-text="This is a red dinosaur.">🔴 Record</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div class="step" data-step="1"></div><div class="step" data-step="2"></div><div class="step" data-step="3"></div><div class="step" data-step="4"></div><div class="badge-done"></div></div>
+      <div style="margin-top:8px;text-align:right;"><button class="reset small" data-idx="1">🔁 Reset</button></div>
+      <div class="result" aria-live="polite"></div>
+    </div>
+
+    <!-- 2 -->
+    <div class="card" data-idx="2">
+      <div class="meta">Chap 2</div>
+      <div class="pt">Eu vejo dois pássaros azuis.</div>
+      <div class="en">I see two blue birds.</div>
+      <div class="translit">ai sí tchú tú blú bérdz</div>
+      <div class="row">
+        <button class="play small" data-text="I see two blue birds.">▶️ Play</button>
+        <button class="slow small" data-text="I see two blue birds.">🐢 Slow</button>
+        <button class="rec small" data-text="I see two blue birds.">🔴 Record</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div class="step" data-step="1"></div><div class="step" data-step="2"></div><div class="step" data-step="3"></div><div class="step" data-step="4"></div><div class="badge-done"></div></div>
+      <div style="margin-top:8px;text-align:right;"><button class="reset small" data-idx="2">🔁 Reset</button></div>
+      <div class="result"></div>
+    </div>
+
+    <!-- 3 -->
+    <div class="card" data-idx="3">
+      <div class="meta">Chap 3</div>
+      <div class="pt">Vamos cantar a canção dos números.</div>
+      <div class="en">Let's sing the big number song.</div>
+      <div class="translit">lêts síng dhi bíg nâmber sông</div>
+      <div class="row">
+        <button class="play small" data-text="Let's sing the big number song.">▶️ Play</button>
+        <button class="slow small" data-text="Let's sing the big number song.">🐢 Slow</button>
+        <button class="rec small" data-text="Let's sing the big number song.">🔴 Record</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div class="step" data-step="1"></div><div class="step" data-step="2"></div><div class="step" data-step="3"></div><div class="step" data-step="4"></div><div class="badge-done"></div></div>
+      <div style="margin-top:8px;text-align:right;"><button class="reset small" data-idx="3">🔁 Reset</button></div>
+      <div class="result"></div>
+    </div>
+
+    <!-- 4 -->
+    <div class="card" data-idx="4">
+      <div class="meta">Chap 4</div>
+      <div class="pt">Desenhe um pássaro com cores do arco-íris.</div>
+      <div class="en">Draw a bird with rainbow colors.</div>
+      <div class="translit">drôu â bérd uith réinbôu cólers</div>
+      <div class="row">
+        <button class="play small" data-text="Draw a bird with rainbow colors.">▶️ Play</button>
+        <button class="slow small" data-text="Draw a bird with rainbow colors.">🐢 Slow</button>
+        <button class="rec small" data-text="Draw a bird with rainbow colors.">🔴 Record</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div class="step" data-step="1"></div><div class="step" data-step="2"></div><div class="step" data-step="3"></div><div class="step" data-step="4"></div><div class="badge-done"></div></div>
+      <div style="margin-top:8px;text-align:right;"><button class="reset small" data-idx="4">🔁 Reset</button></div>
+      <div class="result"></div>
+    </div>
+
+    <!-- 5 -->
+    <div class="card" data-idx="5">
+      <div class="meta">Chap 5</div>
+      <div class="pt">Eu tenho um amigo na escola.</div>
+      <div class="en">I have a friend at school.</div>
+      <div class="translit">ai rév â frend át skóol</div>
+      <div class="row">
+        <button class="play small" data-text="I have a friend at school.">▶️ Play</button>
+        <button class="slow small" data-text="I have a friend at school.">🐢 Slow</button>
+        <button class="rec small" data-text="I have a friend at school.">🔴 Record</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div class="step" data-step="1"></div><div class="step" data-step="2"></div><div class="step" data-step="3"></div><div class="step" data-step="4"></div><div class="badge-done"></div></div>
+      <div style="margin-top:8px;text-align:right;"><button class="reset small" data-idx="5">🔁 Reset</button></div>
+      <div class="result"></div>
+    </div>
+
+    <!-- 6 -->
+    <div class="card" data-idx="6">
+      <div class="meta">Chap 6</div>
+      <div class="pt">Quantos dinossauros você vê?</div>
+      <div class="en">How many dinosaurs do you see?</div>
+      <div class="translit">ráu méni dainôsôrz dú iú sí</div>
+      <div class="row">
+        <button class="play small" data-text="How many dinosaurs do you see?">▶️ Play</button>
+        <button class="slow small" data-text="How many dinosaurs do you see?">🐢 Slow</button>
+        <button class="rec small" data-text="How many dinosaurs do you see?">🔴 Record</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div class="step" data-step="1"></div><div class="step" data-step="2"></div><div class="step" data-step="3"></div><div class="step" data-step="4"></div><div class="badge-done"></div></div>
+      <div style="margin-top:8px;text-align:right;"><button class="reset small" data-idx="6">🔁 Reset</button></div>
+      <div class="result"></div>
+    </div>
+
+    <!-- 7 -->
+    <div class="card" data-idx="7">
+      <div class="meta">Chap 7</div>
+      <div class="pt">Eu gosto de suco.</div>
+      <div class="en">I like juice.</div>
+      <div class="translit">ai láik dzhúis</div>
+      <div class="row">
+        <button class="play small" data-text="I like juice.">▶️ Play</button>
+        <button class="slow small" data-text="I like juice.">🐢 Slow</button>
+        <button class="rec small" data-text="I like juice.">🔴 Record</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div class="step" data-step="1"></div><div class="step" data-step="2"></div><div class="step" data-step="3"></div><div class="step" data-step="4"></div><div class="badge-done"></div></div>
+      <div style="margin-top:8px;text-align:right;"><button class="reset small" data-idx="7">🔁 Reset</button></div>
+      <div class="result"></div>
+    </div>
+
+    <!-- 8 -->
+    <div class="card" data-idx="8">
+      <div class="meta">Chap 8</div>
+      <div class="pt">Pegue o lápis, por favor.</div>
+      <div class="en">Please get the pencil.</div>
+      <div class="translit">plíz guét dhi pénsâl</div>
+      <div class="row">
+        <button class="play small" data-text="Please get the pencil.">▶️ Play</button>
+        <button class="slow small" data-text="Please get the pencil.">🐢 Slow</button>
+        <button class="rec small" data-text="Please get the pencil.">🔴 Record</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div class="step" data-step="1"></div><div class="step" data-step="2"></div><div class="step" data-step="3"></div><div class="step" data-step="4"></div><div class="badge-done"></div></div>
+      <div style="margin-top:8px;text-align:right;"><button class="reset small" data-idx="8">🔁 Reset</button></div>
+      <div class="result"></div>
+    </div>
+
+    <!-- 9 -->
+    <div class="card" data-idx="9">
+      <div class="meta">Chap 7–8</div>
+      <div class="pt">A cadeira é vermelha.</div>
+      <div class="en">The chair is red.</div>
+      <div class="translit">dhi tchéer iz réd</div>
+      <div class="row">
+        <button class="play small" data-text="The chair is red.">▶️ Play</button>
+        <button class="slow small" data-text="The chair is red.">🐢 Slow</button>
+        <button class="rec small" data-text="The chair is red.">🔴 Record</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div class="step" data-step="1"></div><div class="step" data-step="2"></div><div class="step" data-step="3"></div><div class="step" data-step="4"></div><div class="badge-done"></div></div>
+      <div style="margin-top:8px;text-align:right;"><button class="reset small" data-idx="9">🔁 Reset</button></div>
+      <div class="result"></div>
+    </div>
+
+    <!-- 10 -->
+    <div class="card" data-idx="10">
+      <div class="meta">Chap 3</div>
+      <div class="pt">Vamos contar até cinco.</div>
+      <div class="en">Let's count to five.</div>
+      <div class="translit">lêts káunt tu faiv</div>
+      <div class="row">
+        <button class="play small" data-text="Let's count to five.">▶️ Play</button>
+        <button class="slow small" data-text="Let's count to five.">🐢 Slow</button>
+        <button class="rec small" data-text="Let's count to five.">🔴 Record</button>
+      </div>
+      <div class="progress" aria-hidden="true"><div class="step" data-step="1"></div><div class="step" data-step="2"></div><div class="step" data-step="3"></div><div class="step" data-step="4"></div><div class="badge-done"></div></div>
+      <div style="margin-top:8px;text-align:right;"><button class="reset small" data-idx="10">🔁 Reset</button></div>
+      <div class="result"></div>
+    </div>
+
+    <footer>Best used in Chrome on Android. If mic is blocked, open the page in Chrome (⋮ → Open in Chrome). 🎧📚</footer>
+  </div>
+
+  <!-- modal -->
+  <div id="unsupportedModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);align-items:center;justify-content:center;z-index:1200">
+    <div style="background:white;padding:16px;border-radius:12px;max-width:420px;width:92%;box-shadow:0 10px 30px rgba(0,0,0,0.15);margin:40px auto;text-align:left">
+      <h3 style="margin:0 0 8px;font-size:16px">🎙️ Recording not available</h3>
+      <p style="margin:0 0 12px;color:var(--muted)">Recording isn't supported in this browser. For full functionality (Record), open this page in <strong>Chrome on Android</strong> or on a desktop Chrome browser. You can still listen to the sentences here.</p>
+      <div style="display:flex;gap:8px;justify-content:flex-end"><button onclick="hideUnsupportedModal()" style="background:#eee;color:#111;border:0;padding:8px 10px;border-radius:8px;cursor:pointer">Close</button></div>
+    </div>
+  </div>
+
+<script>
+const REQUIRED_CORRECT = 4; const PASS_THRESHOLD = 65;
+function speak(text, rate=1){ if(!('speechSynthesis' in window)) return; const u=new SpeechSynthesisUtterance(text); u.lang='en-US'; u.rate=rate; const v=speechSynthesis.getVoices().find(v=>/en/.test(v.lang)); if(v) u.voice=v; speechSynthesis.cancel(); speechSynthesis.speak(u); }
+function levenshtein(a,b){ a=a.toLowerCase(); b=b.toLowerCase(); const m=a.length,n=b.length; if(m===0) return n; if(n===0) return m; const d=Array(m+1).fill(null).map(()=>Array(n+1).fill(0)); for(let i=0;i<=m;i++) d[i][0]=i; for(let j=0;j<=n;j++) d[0][j]=j; for(let i=1;i<=m;i++){ for(let j=1;j<=n;j++){ const cost=a[i-1]===b[j-1]?0:1; d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+cost); } } return d[m][n]; }
+function scoreMatch(expected, actual){ const dist=levenshtein(expected, actual); const maxLen=Math.max(expected.length,1); const ratio=Math.max(0,1-dist/maxLen); return Math.round(ratio*100); }
+const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+function keyFor(idx){ return `chap1_8_sent_${idx}_count`; }
+function updateProgressUI(card,count){ const steps=Array.from(card.querySelectorAll('.progress .step')); steps.forEach((s,i)=>{ s.classList.remove('filled'); if(i < count) s.classList.add('filled'); }); const badge=card.querySelector('.badge-done'); if(count>=REQUIRED_CORRECT) badge.textContent='✅ Completed'; else badge.textContent=''; }
+function initProgress(){ document.querySelectorAll('.card').forEach(card=>{ const idx=card.dataset.idx; const c=parseInt(localStorage.getItem(keyFor(idx))||'0',10); updateProgressUI(card,c); }); }
+function resetProgress(idx){ localStorage.setItem(keyFor(idx),0); const card=document.querySelector(`.card[data-idx="${idx}"]`); if(card){ updateProgressUI(card,0); const res=card.querySelector('.result'); if(res) res.textContent=''; } }
+function showUnsupportedModal(){ document.getElementById('unsupportedModal').style.display='flex'; }
+function hideUnsupportedModal(){ document.getElementById('unsupportedModal').style.display='none'; }
+window.addEventListener('load', ()=>{
+  if(!Recognition){ setTimeout(showUnsupportedModal,600); }
+  document.querySelectorAll('.play').forEach(b=>b.addEventListener('click', ()=>speak(b.dataset.text,1)));
+  document.querySelectorAll('.slow').forEach(b=>b.addEventListener('click', ()=>speak(b.dataset.text,0.75)));
+  document.querySelectorAll('.reset').forEach(b=>b.addEventListener('click', ()=>{ const idx=b.dataset.idx; if(!idx) return; if(confirm('Reset progress for this sentence?')) resetProgress(idx); }));
+  document.querySelectorAll('.rec').forEach(b=>b.addEventListener('click', ()=>{
+    const card=b.closest('.card'); const res=card.querySelector('.result'); if(!Recognition){ res.textContent='SpeechRecognition not supported. Use Chrome on Android.'; return; } if(b.disabled) return; const expected=b.dataset.text; const idx=card.dataset.idx; const recog=new Recognition(); recog.lang='en-US'; recog.interimResults=false; recog.maxAlternatives=3; res.textContent='🎙️ Listening...'; try{ recog.start(); }catch(e){ res.textContent='Could not start mic.'; return; } recog.onresult = ev=>{ const transcript=ev.results[0][0].transcript; const score=scoreMatch(expected,transcript); res.innerHTML = `You said: "<em>${transcript}</em>" — ${score>=PASS_THRESHOLD? '✅ Good!':'❌ Try again'} <span class="score">${score}%</span>`; if(score>=PASS_THRESHOLD){ const prev=parseInt(localStorage.getItem(keyFor(idx))||'0',10); const now=Math.min(REQUIRED_CORRECT,prev+1); localStorage.setItem(keyFor(idx),now); updateProgressUI(card,now); } recog.stop(); };
+    recog.onerror = ev=>{ res.textContent = 'Error: '+ev.error; };
+  }));
+  initProgress();
+});
+</script>
+</body>
+</html>

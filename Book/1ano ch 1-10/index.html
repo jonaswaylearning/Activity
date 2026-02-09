@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>1º Ano — Palavras (Capítulos 1–10) — Cartões & Quiz</title>
+<style>
+  :root{--bg:#f7f7f8;--card:#fff;--muted:#666;--accent:#111;--green:#0a8f3c}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--accent);margin:0;padding:20px}
+  .wrap{max-width:980px;margin:0 auto}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  h1{font-size:20px;margin:0}
+  p.lead{margin:6px 0 16px;color:var(--muted)}
+  .controls{display:flex;gap:8px;align-items:center}
+  button{background:var(--accent);color:#fff;border:0;padding:8px 10px;border-radius:8px;cursor:pointer;font-weight:600}
+  .small{padding:6px 8px;font-size:13px;border-radius:6px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:16px}
+  .card{background:var(--card);padding:12px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.05)}
+  .pt{color:#333;margin-bottom:6px}
+  .en{font-weight:700;color:#111;margin-bottom:6px}
+  .trans{font-style:italic;color:#555;margin-bottom:8px}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .result{margin-top:8px;min-height:20px}
+  .progress{display:flex;gap:6px;margin-top:8px}
+  .progress .step{flex:1;height:8px;border-radius:6px;background:#eee}
+  .progress .step.filled{background:var(--green)}
+  footer{color:var(--muted);font-size:13px;margin-top:18px}
+  #quizPanel{display:none;margin-top:18px}
+  .quiz-card{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.05)}
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+  .option{background:#f1f5f9;border:0;padding:10px;border-radius:8px;cursor:pointer}
+  @media (prefers-color-scheme:dark){:root{--bg:#0f1112;--card:#0e1112;--muted:#9aa0a6;--accent:#e6e6e6} .pt{color:#e6e6e6} .en{color:#fff} .trans{color:#cfcfcf}}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>1º Ano — Palavras: Capítulos 1–10</h1>
+        <p class="lead">Cartões com palavra em português, inglês e pronúncia. ▶️ Play, 🐢 Slow, 🔴 Record. Modo Quiz com opções.</p>
+      </div>
+      <div class="controls">
+        <button id="cardsBtn" class="small">Ver Cartões</button>
+        <button id="quizBtn" class="small">Iniciar Quiz</button>
+        <button id="resetAll" class="small">🔁 Reset Tudo</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="cardsPanel">
+        <div class="grid" id="cardsGrid"></div>
+      </section>
+
+      <section id="quizPanel">
+        <div class="quiz-card">
+          <div id="quizQuestion" style="font-weight:700;font-size:18px">Pergunta</div>
+          <div id="quizTrans" style="color:var(--muted);margin-top:6px">Tradução</div>
+          <div class="options" id="quizOptions"></div>
+          <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+            <button id="nextQ" class="small">Próxima</button>
+            <button id="endQuiz" class="small">Sair do Quiz</button>
+          </div>
+          <div id="quizResult" style="margin-top:10px;min-height:18px;font-weight:700"></div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer>Recomendado: Chrome no Android para gravação. Progresso salvo localmente.</footer>
+  </div>
+
+<script>
+// Vocabulary (words only) — extracted from 1º ano.txt (Chapters 1–10)
+const vocab = [
+  // Chapter 1 - FRIENDS
+  {pt:'menino', en:'boy', trans:'bói'},
+  {pt:'menina', en:'girl', trans:'gârl'},
+  {pt:'animal de estimação', en:'pet', trans:'pét'},
+  {pt:'desenhar', en:'draw', trans:'drô'},
+  {pt:'amigos', en:'friends', trans:'frends'},
+  // Chapter 2 - HOME (foods)
+  {pt:'arroz', en:'rice', trans:'ráis'},
+  {pt:'feijão', en:'beans', trans:'bíns'},
+  {pt:'salada', en:'salad', trans:'sélâd'},
+  {pt:'suco', en:'juice', trans:'djúss'},
+  {pt:'frango', en:'chicken', trans:'tchíken'},
+  // Chapter 3 - DELICIOUS (foods & colors)
+  {pt:'refrigerante', en:'soda', trans:'sôuda'},
+  {pt:'pipoca', en:'popcorn', trans:'pópcórn'},
+  {pt:'bolo', en:'cake', trans:'kêik'},
+  {pt:'pizza', en:'pizza', trans:'píitsâ'},
+  {pt:'verde', en:'green', trans:'grín'},
+  {pt:'azul', en:'blue', trans:'blú'},
+  {pt:'vermelho', en:'red', trans:'réd'},
+  {pt:'amarelo', en:'yellow', trans:'yélou'},
+  {pt:'preto', en:'black', trans:'blák'},
+  {pt:'branco', en:'white', trans:'uáit'},
+  {pt:'rosa', en:'pink', trans:'pínk'},
+  {pt:'laranja', en:'orange', trans:'órendj'},
+  // Chapter 4 - CLOTHES
+  {pt:'camiseta', en:'T-shirt', trans:'tí-sshârt'},
+  {pt:'vestido', en:'dress', trans:'drés'},
+  {pt:'shorts', en:'shorts', trans:'xórts'},
+  {pt:'sandálias', en:'sandals', trans:'séndâls'},
+  {pt:'boné', en:'cap', trans:'kép'},
+  {pt:'tênis', en:'sneakers', trans:'sníkers'},
+  // Chapter 5 - FAMILY
+  {pt:'irmão', en:'brother', trans:'brâder'},
+  {pt:'irmã', en:'sister', trans:'síster'},
+  {pt:'pai', en:'dad', trans:'dæd'},
+  {pt:'mãe', en:'mom', trans:'mom'},
+  {pt:'amor', en:'love', trans:'lâv'},
+  // Chapter 6 - A TRIP (places)
+  {pt:'praia', en:'beach', trans:'bítch'},
+  {pt:'escola', en:'school', trans:'skúl'},
+  {pt:'supermercado', en:'supermarket', trans:'súpermárkit'},
+  {pt:'shopping', en:'shopping mall', trans:'chóping môl'},
+  {pt:'cinema', en:'cinema', trans:'sínema'},
+  {pt:'montanhas', en:'mountains', trans:'máuntinz'},
+  // Chapter 7 - FARM ANIMALS
+  {pt:'cavalo', en:'horse', trans:'hôrs'},
+  {pt:'vaca', en:'cow', trans:'cáu'},
+  {pt:'ovelha', en:'sheep', trans:'ship'},
+  {pt:'galinha', en:'hen', trans:'hén'},
+  {pt:'galo', en:'rooster', trans:'rúster'},
+  {pt:'pato', en:'duck', trans:'dâk'},
+  {pt:'porco', en:'pig', trans:'píg'},
+  // Chapter 8 - WILD ANIMALS
+  {pt:'leão', en:'lion', trans:'láion'},
+  {pt:'macaco', en:'monkey', trans:'mânki'},
+  {pt:'girafa', en:'giraffe', trans:'djiráf'},
+  {pt:'hipopótamo', en:'hippo', trans:'rípou'},
+  {pt:'elefante', en:'elephant', trans:'élifant'},
+  {pt:'crocodilo', en:'crocodile', trans:'krôkodáil'},
+  {pt:'cobra', en:'snake', trans:'snéik'},
+  // Chapter 9 - DAY AND NIGHT
+  {pt:'dia', en:'day', trans:'dêi'},
+  {pt:'noite', en:'night', trans:'náit'},
+  {pt:'lua', en:'moon', trans:'mún'},
+  {pt:'sol', en:'sun', trans:'sân'},
+  {pt:'estrelas', en:'stars', trans:'stárz'},
+  {pt:'céu', en:'sky', trans:'skái'},
+  // Chapter 10 - SCHOOL
+  {pt:'lápis', en:'pencil', trans:'pénsâl'},
+  {pt:'caderno', en:'notebook', trans:'nôutbuk'},
+  {pt:'borracha', en:'eraser', trans:'irêiser'},
+  {pt:'apontador', en:'sharpener', trans:'shárpêner'},
+  {pt:'mochila', en:'schoolbag', trans:'skúl-bæg'},
+  {pt:'régua', en:'ruler', trans:'rúler'},
+  {pt:'caneta', en:'pen', trans:'pén'}
+];
+
+// Config
+const REQUIRED_CORRECT = 4; const PASS_THRESHOLD = 65; const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+
+function speak(text, rate=1){ if(!('speechSynthesis' in window)) return; const u=new SpeechSynthesisUtterance(text); u.lang='en-US'; u.rate=rate; const v=speechSynthesis.getVoices().find(v=>/en/.test(v.lang)); if(v) u.voice=v; speechSynthesis.cancel(); speechSynthesis.speak(u); }
+function levenshtein(a,b){ a=a.toLowerCase(); b=b.toLowerCase(); const m=a.length,n=b.length; if(m===0) return n; if(n===0) return m; const d=Array(m+1).fill(null).map(()=>Array(n+1).fill(0)); for(let i=0;i<=m;i++) d[i][0]=i; for(let j=0;j<=n;j++) d[0][j]=j; for(let i=1;i<=m;i++){ for(let j=1;j<=n;j++){ const cost=a[i-1]===b[j-1]?0:1; d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+cost); } } return d[m][n]; }
+function scoreMatch(expected, actual){ const dist=levenshtein(expected, actual); const maxLen=Math.max(expected.length,1); const ratio=Math.max(0,1-dist/maxLen); return Math.round(ratio*100); }
+
+function keyFor(idx){ return `1ano_words_${idx}_count`; }
+function updateProgressUI(card,count){ const steps=Array.from(card.querySelectorAll('.progress .step')); steps.forEach((s,i)=>{ s.classList.remove('filled'); if(i < count) s.classList.add('filled'); }); }
+
+// Build cards
+function buildCards(){ const grid=document.getElementById('cardsGrid'); grid.innerHTML=''; vocab.forEach((w,i)=>{ const idx=i+1; const card=document.createElement('div'); card.className='card'; card.dataset.idx=idx; card.innerHTML = `
+    <div class="pt">🇧🇷 ${w.pt}</div>
+    <div class="en">🇺🇸 <strong>${w.en}</strong></div>
+    <div class="trans">${w.trans}</div>
+    <div class="row">
+      <button class="play small" data-text="${escapeHtml(w.en)}">▶️ Play</button>
+      <button class="slow small" data-text="${escapeHtml(w.en)}">🐢 Slow</button>
+      <button class="rec small" data-text="${escapeHtml(w.en)}">🔴 Record</button>
+    </div>
+    <div class="progress" aria-hidden="true">
+      <div class="step" data-step="1"></div>
+      <div class="step" data-step="2"></div>
+      <div class="step" data-step="3"></div>
+      <div class="step" data-step="4"></div>
+    </div>
+    <div class="result"></div>
+  `; grid.appendChild(card); }); attachCardHandlers(); }
+function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function attachCardHandlers(){ document.querySelectorAll('.play').forEach(btn=>btn.onclick=()=>speak(btn.dataset.text,1)); document.querySelectorAll('.slow').forEach(btn=>btn.onclick=()=>speak(btn.dataset.text,0.75)); document.querySelectorAll('.rec').forEach(btn=>btn.onclick=()=>{
+  const btnEl=event.currentTarget; const card=btnEl.closest('.card'); const res=card.querySelector('.result'); if(!Recognition){ res.textContent='Gravação não suportada aqui. Use Chrome.'; return; } const expected=btnEl.dataset.text; const idx=card.dataset.idx; const recog=new Recognition(); recog.lang='en-US'; recog.interimResults=false; recog.maxAlternatives=3; res.textContent='🎙️ Ouvindo...'; try{ recog.start(); }catch(e){ res.textContent='Não foi possível iniciar o microfone.'; return; } recog.onresult = ev=>{ const transcript=ev.results[0][0].transcript; const score=scoreMatch(expected, transcript); res.innerHTML = `Você disse: "<em>${transcript}</em>" — ` + (score>=PASS_THRESHOLD? '✅ Bom!':'❌ Tente de novo') + ` <span style="color:var(--bg)">${score}%</span>`; if(score>=PASS_THRESHOLD){ const prev=parseInt(localStorage.getItem(keyFor(idx))||'0',10); const now=Math.min(REQUIRED_CORRECT,prev+1); localStorage.setItem(keyFor(idx),now); updateProgressUI(card,now); } recog.stop(); };
+  recog.onerror = ev=>{ res.textContent = 'Erro: '+ev.error; };
+}); }
+
+// Quiz
+let quizOrder=[]; let quizIdx=0; let quizScore=0;
+function startQuiz(){ document.getElementById('cardsPanel').style.display='none'; document.getElementById('quizPanel').style.display='block'; quizOrder = shuffle(Array.from(Array(vocab.length).keys())); quizIdx=0; quizScore=0; showQuizQ(); }
+function endQuiz(){ document.getElementById('quizPanel').style.display='none'; document.getElementById('cardsPanel').style.display='block'; alert('Quiz terminado. Pontuação: '+quizScore+'/'+quizOrder.length); }
+function showQuizQ(){ const qi=quizOrder[quizIdx]; const word=vocab[qi]; document.getElementById('quizQuestion').textContent = `Qual é a tradução em inglês de:`; document.getElementById('quizTrans').textContent = `🇧🇷 ${word.pt}`; const opts=makeOptions(qi); const container=document.getElementById('quizOptions'); container.innerHTML=''; opts.forEach(o=>{ const b=document.createElement('button'); b.className='option'; b.textContent = o.en; b.onclick = ()=>{ handleAnswer(o, word); }; container.appendChild(b); }); document.getElementById('quizResult').textContent=''; }
+function handleAnswer(choice, correct){ const out=document.getElementById('quizResult'); if(choice.en===correct.en){ out.textContent='✅ Correto!'; quizScore++; const idx = vocab.findIndex(v=>v.en===correct.en)+1; const card = document.querySelector(`.card[data-idx="${idx}"]`); if(card){ const prev=parseInt(localStorage.getItem(keyFor(idx))||'0',10); const now=Math.min(REQUIRED_CORRECT,prev+1); localStorage.setItem(keyFor(idx),now); updateProgressUI(card,now); } } else { out.textContent='❌ Errado. Tente a próxima.'; } }
+function nextQuizQ(){ quizIdx++; if(quizIdx>=quizOrder.length) endQuiz(); else showQuizQ(); }
+function makeOptions(correctIdx){ const choices=new Set(); choices.add(vocab[correctIdx]); while(choices.size<4){ const r=vocab[Math.floor(Math.random()*vocab.length)]; choices.add(r); } return shuffle(Array.from(choices)); }
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
+
+function init(){ buildCards(); document.getElementById('quizBtn').onclick = startQuiz; document.getElementById('cardsBtn').onclick = ()=>{ document.getElementById('quizPanel').style.display='none'; document.getElementById('cardsPanel').style.display='block'; };
+  document.getElementById('endQuiz').onclick = endQuiz; document.getElementById('nextQ').onclick = nextQuizQ; document.getElementById('resetAll').onclick = ()=>{ if(confirm('Resetar todo o progresso?')){ vocab.forEach((v,i)=>localStorage.setItem(keyFor(i+1),0)); document.querySelectorAll('.card').forEach(c=>updateProgressUI(c,0)); }};
+  // restore progress UI
+  setTimeout(()=>{ document.querySelectorAll('.card').forEach(c=>{ const idx=c.dataset.idx; const count=parseInt(localStorage.getItem(keyFor(idx))||'0',10); updateProgressUI(c,count); }); },120);
+}
+window.addEventListener('load', init);
+</script>
+</body>
+</html>
