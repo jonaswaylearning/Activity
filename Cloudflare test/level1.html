@@ -8,8 +8,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background: #f3f4f6; -webkit-tap-highlight-color: transparent; }
-        .card { display: none; }
-        .card.active { display: block; }
+.card {
+    display: none;
+    position: relative;
+}
+
+.card.active {
+    display: block;
+}
         .grammar-tag { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; }
         .type-affirmative { color: #059669; }
         .type-negative { color: #dc2626; }
@@ -31,6 +37,45 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
         button:active { transform: scale(0.92); }
+        /* 🎉 PARTY ANIMATION */
+.confetti {
+    position: fixed;
+    top: -10px;
+    width: 8px;
+    height: 14px;
+    opacity: 0.9;
+    animation: fall linear forwards;
+    z-index: 9999;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(110vh) rotate(360deg);
+    }
+}
+   .point-pulse {
+    position: absolute;
+    color: #10b981;
+    font-weight: 700;
+    font-size: 0.9rem;
+    animation: pointFloat 0.8s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes pointFloat {
+    0% {
+        opacity: 0;
+        transform: translateY(0) scale(0.9);
+    }
+    20% {
+        opacity: 1;
+        transform: translateY(-6px) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-16px) scale(1.05);
+    }
+}
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -180,28 +225,36 @@ function toggleRecording(i) {
 
 function checkPronunciation(spokenText) {
     const target = sentences[currentIndex].en;
-    const score = calculateSimilarity(spokenText.toLowerCase(), target.toLowerCase());
+    const cleanSpoken = spokenText.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "").toLowerCase();
+const cleanTarget = target.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "").toLowerCase();
+const score = calculateSimilarity(cleanSpoken, cleanTarget);
     const msg = document.getElementById('result-msg');
     const cardContainer = document.getElementById('slider-container');
     const displaySpoken = `"${spokenText}"`;
 
     if (score >= 0.75) {
+    
+    showPointPulse(currentIndex);
+    addPointToday();
 
         // ✅ Progress only if not mastered yet
         if (slideProgress[currentIndex] < 3) {
-            slideProgress[currentIndex]++;
-            const currentDot = document.getElementById(
-                `step-${currentIndex}-${slideProgress[currentIndex]}`
-            );
-            currentDot.classList.add('active', 'pop-success');
+    slideProgress[currentIndex]++;
+    const currentDot = document.getElementById(
+        `step-${currentIndex}-${slideProgress[currentIndex]}`
+    );
+    currentDot.classList.add('active', 'pop-success');
 
-            if (slideProgress[currentIndex] === 3) {
-                cardContainer.classList.add('mastery-achieved');
-                playMasterySound();
-            }
+    if (slideProgress[currentIndex] === 3) {
+        cardContainer.classList.add('mastery-achieved');
+        playMasterySound();
+    }
 
-            saveProgress();
-        }
+     if (slideProgress.every(p => p === 3)) {
+        partyAnimation();
+    }
+}
+        saveProgress();
 
         // ✅ Feedback ALWAYS shown
         msg.innerHTML = `
@@ -221,10 +274,12 @@ function checkPronunciation(spokenText) {
               Try one more time!
             </div>
           </div>`;
+    
     }
 
     updateUI();
 }
+
 
 function playMasterySound() {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -314,11 +369,62 @@ function confirmReset() {
         updateUI();
     }
 }
+function partyAnimation() {
+    for (let i = 0; i < 120; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.backgroundColor =
+            ['#f43f5e', '#facc15', '#22c55e', '#3b82f6', '#a855f7']
+            [Math.floor(Math.random() * 5)];
+        confetti.style.animationDuration = (2 + Math.random() * 2) + 's';
+        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+        document.body.appendChild(confetti);
+
+        setTimeout(() => confetti.remove(), 4000);
+    }
+}
+function showPointPulse(cardIndex) {
+    const card = document.querySelector('.card.active');
+    if (!card) return;
+
+    const mic = document.getElementById(`mic-icon-${cardIndex}`);
+    if (!mic) return;
+
+    const pulse = document.createElement('div');
+    pulse.className = 'point-pulse';
+    pulse.innerText = '+1';
+
+    // position relative to the card
+    const micRect = mic.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+
+    pulse.style.left = (micRect.left - cardRect.left + 20) + 'px';
+    pulse.style.top  = (micRect.top  - cardRect.top  - 10) + 'px';
+
+    card.appendChild(pulse);
+
+    setTimeout(() => pulse.remove(), 800);
+}
+function addPointToday() {
+    const today = new Date().toISOString().split('T')[0];
+
+    const lastDate = localStorage.getItem('jonas_way_points_date');
+    let points = parseInt(localStorage.getItem('jonas_way_points_today') || '0', 10);
+
+    // 🔄 Midnight reset
+    if (lastDate !== today) {
+        points = 0;
+        localStorage.setItem('jonas_way_points_date', today);
+    }
+
+    points += 1;
+    localStorage.setItem('jonas_way_points_today', points);
+}
+
 </script>
 </body>
 </html>
-
-
 
 
 
