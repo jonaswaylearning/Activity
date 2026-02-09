@@ -106,7 +106,7 @@
     color: #10b981;
     font-weight: 700;
     font-size: 1.4rem;
-    animation: pointFloat 0.8s ease-out forwards;
+    animation: pointFloat 1.2s ease-out forwards;
     pointer-events: none;
 }
 
@@ -273,64 +273,94 @@ function toggleRecording(i) {
 
 function checkPronunciation(spokenText) {
     const target = sentences[currentIndex].en;
-    const cleanSpoken = spokenText.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "").toLowerCase();
-const cleanTarget = target.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "").toLowerCase();
-const score = calculateSimilarity(cleanSpoken, cleanTarget);
+
+    const cleanSpoken = spokenText
+        .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "")
+        .toLowerCase();
+
+    const cleanTarget = target
+        .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "")
+        .toLowerCase();
+
+    const score = calculateSimilarity(cleanSpoken, cleanTarget);
+
     const msg = document.getElementById('result-msg');
     const cardContainer = document.getElementById('slider-container');
     const displaySpoken = `"${spokenText}"`;
 
+    /* ✅ SUCCESS */
     if (score >= 0.75) {
 
-    if (canEarnPoint(currentIndex)) {
-        showPointPulse(currentIndex);
-        addPointToday();
-        registerCardPoint(currentIndex);
-    }
-    
-        // ✅ Progress only if not mastered yet
+        /* 🎯 POINT SYSTEM (max 6 per card / day) */
+        if (canEarnPoint(currentIndex)) {
+            showPointPulse(currentIndex);
+            addPointToday();
+            registerCardPoint(currentIndex);
+
+            const today = new Date().toISOString().split('T')[0];
+            const data = JSON.parse(
+                localStorage.getItem(`jonas_way_card_points_${today}`) || '{}'
+            );
+
+            // 🌟 Reinforcement milestone (6th success)
+            if (data[currentIndex] === 6) {
+                showCardBanner('REINFORCED!', 'banner-reinforced');
+            }
+        }
+
+        /* 🧠 MASTERY PROGRESSION (only until 3) */
         if (slideProgress[currentIndex] < 3) {
-    slideProgress[currentIndex]++;
-    const currentDot = document.getElementById(
-        `step-${currentIndex}-${slideProgress[currentIndex]}`
-    );
-    currentDot.classList.add('active', 'pop-success');
+            slideProgress[currentIndex]++;
 
-    if (slideProgress[currentIndex] === 3) {
-        cardContainer.classList.add('mastery-achieved');
-        playMasterySound();
-    }
+            const currentDot = document.getElementById(
+                `step-${currentIndex}-${slideProgress[currentIndex]}`
+            );
+            currentDot.classList.add('active', 'pop-success');
 
-     if (slideProgress.every(p => p === 3)) {
-        partyAnimation();
-    }
-}
+            // 🏆 Card mastered
+            if (slideProgress[currentIndex] === 3) {
+                cardContainer.classList.add('mastery-achieved');
+                playMasterySound();
+                showCardBanner('CLEAR!', 'banner-clear');
+            }
+
+            // 🎉 All cards mastered
+            if (slideProgress.every(p => p === 3)) {
+                partyAnimation();
+            }
+        }
+
         saveProgress();
 
-        // ✅ Feedback ALWAYS shown
+        /* ✅ SUCCESS FEEDBACK (always shown) */
         msg.innerHTML = `
-          <div class="feedback-entry">
-            <div class="text-green-500 text-xl font-bold">✅ ${displaySpoken}</div>
-            <div class="text-gray-400 text-[10px] uppercase tracking-widest mt-1">
-              Matched with ${Math.round(score * 100)}% accuracy
+            <div class="feedback-entry">
+                <div class="text-green-500 text-xl font-bold">
+                    ✅ ${displaySpoken}
+                </div>
+                <div class="text-gray-400 text-[10px] uppercase tracking-widest mt-1">
+                    Matched with ${Math.round(score * 100)}% accuracy
+                </div>
             </div>
-          </div>`;
+        `;
 
-    } else {
-        // ❌ Failure feedback always shown
+    } 
+    /* ❌ FAILURE */
+    else {
         msg.innerHTML = `
-          <div class="feedback-entry">
-            <div class="text-red-500 text-xl font-bold">❌ ${displaySpoken}</div>
-            <div class="text-gray-400 text-[10px] uppercase tracking-widest mt-1 italic">
-              Try one more time!
+            <div class="feedback-entry">
+                <div class="text-red-500 text-xl font-bold">
+                    ❌ ${displaySpoken}
+                </div>
+                <div class="text-gray-400 text-[10px] uppercase tracking-widest mt-1 italic">
+                    Try one more time!
+                </div>
             </div>
-          </div>`;
-    
+        `;
     }
 
     updateUI();
 }
-
 
 function playMasterySound() {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -372,15 +402,7 @@ function calculateSimilarity(s1, s2) {
 }
 
 function updateUI() {
-    const container = document.getElementById('slider-container');
-
-    if (slideProgress[currentIndex] === 3) {
-        container.classList.add('mastery-achieved');
-    } else {
-        container.classList.remove('mastery-achieved');
-    }
-
-    document.querySelectorAll('.card').forEach((c, i) =>
+      document.querySelectorAll('.card').forEach((c, i) =>
         c.classList.toggle('active', i === currentIndex)
     );
 
@@ -490,6 +512,19 @@ function registerCardPoint(cardIndex) {
     data[cardIndex] = (data[cardIndex] || 0) + 1;
     localStorage.setItem(key, JSON.stringify(data));
 }
+
+function showCardBanner(text, className) {
+    const card = document.querySelector('.card.active');
+    if (!card) return;
+
+    const banner = document.createElement('div');
+    banner.className = `card-banner ${className}`;
+    banner.innerText = text;
+
+    card.appendChild(banner);
+    setTimeout(() => banner.remove(), 1500);
+}
+
 
 </script>
 </body>
