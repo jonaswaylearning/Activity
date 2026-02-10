@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jonas Way - Today is Monday</title>
+    <style>
+        :root { --primary: #3498db; --bg: #f0f2f5; --text: #2c3e50; --card: #ffffff; --win: #2ecc71; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .header-container { width: 100%; background: #fff; padding: 15px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .progress-bar { width: 80%; max-width: 800px; height: 8px; background: #e0e0e0; margin: 0 auto 10px; border-radius: 4px; overflow: hidden; }
+        #global-p { height: 100%; width: 0%; background: var(--primary); transition: width 0.3s; }
+        .header-controls { width: 80%; max-width: 800px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        #counter { font-weight: bold; color: var(--primary); }
+        .btn-rs { background: #e74c3c; color: #fff; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+        .slider { flex: 1; display: flex; align-items: center; justify-content: center; width: 100%; max-width: 600px; padding: 20px; }
+        .card { background: var(--card); width: 100%; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; display: none; }
+        .card.active { display: block; animation: fIn 0.4s; }
+        @keyframes fIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .en { font-size: 2.2em; font-weight: bold; margin-bottom: 10px; color: var(--primary); }
+        .ph { font-size: 1.3em; color: #7f8c8d; margin-bottom: 5px; }
+        .pt { font-size: 1.1em; color: #95a5a6; margin-bottom: 25px; }
+        .dots { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
+        .dot { width: 50px; height: 8px; background: #eee; border-radius: 4px; }
+        .dot.on { background: var(--win); }
+        .acts { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; }
+        .btn-a { border: none; padding: 15px 25px; border-radius: 50px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .btn-rec { background: var(--primary); color: #fff; }
+        .btn-rec.rec { background: #e74c3c; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .navs { display: flex; justify-content: space-between; width: 100%; margin-top: 20px; }
+        .btn-n { background: none; border: 2px solid var(--primary); color: var(--primary); padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        footer { padding: 20px; font-size: 0.9em; color: #bdc3c7; }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <div class="progress-bar"><div id="global-p"></div></div>
+        <div class="header-controls"><span id="counter">1/21</span><button class="btn-rs" onclick="_0x5a21()">🔄 Reset</button></div>
+    </div>
+    <div class="slider" id="slider"></div>
+    <footer>Created by Jonas Freitas Goes</footer>
+
+    <script>
+        // 10151401190618050920011907150519
+        const _0x192a = [
+            ["Today is Monday.", "tchudêi irêz mándêi", "Hoje é segunda-feira."],
+            ["English class today.", "ínglich kléas tchudêi", "Aula de inglês hoje."],
+            ["I like Geography.", "ái láik djiógrâfi", "Eu gosto de Geografia."],
+            ["Where is Nina?", "uérhiz nína", "Onde está a Nina?"],
+            ["Let's check it.", "léts tchék it", "Vamos conferir."],
+            ["Today is Tuesday.", "tchudêi irêz tiúzdêi", "Hoje é terça-feira."],
+            ["It is Wednesday.", "irêz uénzdêi", "É quarta-feira."],
+            ["I have Science.", "ái rév sáiâns", "Eu tenho Ciências."],
+            ["It's on Thursday.", "its ón thârhzdêi", "É na quinta-feira."],
+            ["Friday is great.", "frhái dêi irêz grhêit", "Sexta-feira é ótimo."],
+            ["Saturday is free.", "séatârhdêi irêz frí", "Sábado é livre."],
+            ["Sunday is free.", "sándêi irêz frí", "Domingo é livre."],
+            ["What a day!", "uórâ dêi", "Que dia!"],
+            ["My favorite class.", "mái fêivorhit kléas", "Minha aula favorita."],
+            ["Art on Thursdays.", "árh t ón thârhzdêis", "Arte às quintas-feiras."],
+            ["History is cool.", "hístôrhi irêz kúl", "História é legal."],
+            ["I have Math.", "ái rév méath", "Eu tenho Matemática."],
+            ["School is big.", "iskúl irêz bíg", "A escola é grande."],
+            ["Modern and big.", "módârh n énd bíg", "Moderna e grande."],
+            ["Teachers are great.", "títchârhz árh grhêit", "Os professores são ótimos."],
+            ["I love school.", "ái láv iskúl", "Eu amo a escola."]
+        ];
+
+        let _0x42 = 0;
+        let _0x99 = new Array(21).fill(0);
+        const _0xSR = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        _0xSR.lang = 'en-US';
+        const _0xSS = window.speechSynthesis;
+        let _0xR = false;
+
+        function _0xRender() {
+            const s = document.getElementById('slider');
+            _0x192a.forEach((d, i) => {
+                const c = document.createElement('div');
+                c.className = `card ${i === 0 ? 'active' : ''}`;
+                c.innerHTML = `<div class="en">${d[0]}</div><div class="ph">${d[1]}</div><div class="pt">${d[2]}</div><div class="dots" id="d-${i}"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="acts"><button class="btn-a" onclick="_0xP(${i})">🔊 Play</button><button class="btn-a btn-rec" id="r-${i}" onclick="_0xT(${i})">🎙️ Record</button></div><div class="navs"><button class="btn-n" onclick="_0xPr()">Previous</button><button class="btn-n" onclick="_0xNx()">Next</button></div>`;
+                s.appendChild(c);
+            });
+            _0xUpd();
+        }
+
+        window._0xP = (i) => { if(_0xR) _0xSR.stop(); _0xSS.cancel(); const u = new SpeechSynthesisUtterance(_0x192a[i][0]); u.lang='en-US'; u.rate=0.8; _0xSS.speak(u); };
+        window._0xT = (i) => { if(_0xR) { _0xSR.stop(); } else { _0xSS.cancel(); _0xSR.start(); document.getElementById(`r-${i}`).classList.add('rec'); _0xR=true; } };
+
+        _0xSR.onresult = (e) => {
+            const t = e.results[0][0].transcript.toLowerCase();
+            const g = _0x192a[_0x42][0].toLowerCase().replace(/[!.?]/g, '');
+            if(_0xSim(t, g) >= 0.6) { if(_0x99[_0x42] < 3) { _0x99[_0x42]++; _0xUpdD(); } }
+        };
+
+        _0xSR.onend = () => { document.querySelectorAll('.btn-rec').forEach(b => b.classList.remove('rec')); _0xR=false; };
+
+        function _0xSim(s1, s2) {
+            let l = s1.length < s2.length ? s2 : s1;
+            if (l.length == 0) return 1.0;
+            return (l.length - _0xLev(s1, s2)) / parseFloat(l.length);
+        }
+
+        function _0xLev(s1, s2) {
+            let c = [];
+            for (let i = 0; i <= s1.length; i++) {
+                let v = i;
+                for (let j = 0; j <= s2.length; j++) {
+                    if (i == 0) c[j] = j;
+                    else if (j > 0) { let n = c[j-1]; if(s1[i-1] != s2[j-1]) n = Math.min(Math.min(n, v), c[j]) + 1; c[j-1] = v; v = n; }
+                }
+                if (i > 0) c[s2.length] = v;
+            }
+            return c[s2.length];
+        }
+
+        function _0xUpdD() {
+            const d = document.getElementById(`d-${_0x42}`).children;
+            for(let i=0; i<_0x99[_0x42]; i++) d[i].classList.add('on');
+        }
+
+        function _0xUpd() {
+            document.querySelectorAll('.card').forEach((c, i) => c.classList.toggle('active', i === _0x42));
+            document.getElementById('counter').innerText = `${_0x42 + 1}/21`;
+            document.getElementById('global-p').style.width = `${((_0x42 + 1) / 21) * 100}%`;
+            _0xUpdD();
+        }
+
+        window._0xNx = () => { if(_0x42 < 20) { _0x42++; _0xUpd(); } };
+        window._0xPr = () => { if(_0x42 > 0) { _0x42--; _0xUpd(); } };
+        window._0x5a21 = () => { if(confirm("Reiniciar?")) location.reload(); };
+
+        _0xRender();
+    </script>
+</body>
+</html>

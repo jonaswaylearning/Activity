@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jonas Way - Pronúncia Interativa</title>
+    <style>
+        :root { --primary-color: #3498db; --bg-color: #f0f2f5; --text-color: #2c3e50; --card-bg: #ffffff; --success-color: #2ecc71; --border-radius: 12px; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .header-container { width: 100%; background: #fff; padding: 15px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .progress-bar-container { width: 80%; max-width: 800px; height: 8px; background: #e0e0e0; margin: 0 auto 10px; border-radius: 4px; overflow: hidden; }
+        #global-progress { height: 100%; width: 0%; background: var(--primary-color); transition: width 0.3s ease; }
+        .header-controls { width: 80%; max-width: 800px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        #counter { font-weight: bold; color: var(--primary-color); }
+        .btn-reset { background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 0.9em; }
+        .slider-container { flex: 1; display: flex; align-items: center; justify-content: center; width: 100%; max-width: 600px; padding: 20px; }
+        .card { background: var(--card-bg); width: 100%; padding: 40px; border-radius: var(--border-radius); box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; display: none; }
+        .card.active { display: block; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .sentence-en { font-size: 2em; font-weight: bold; margin-bottom: 10px; color: var(--primary-color); }
+        .sentence-phonetic { font-size: 1.3em; color: #7f8c8d; margin-bottom: 5px; }
+        .sentence-pt { font-size: 1em; color: #95a5a6; margin-bottom: 25px; }
+        .local-dots { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
+        .dot { width: 50px; height: 8px; background: #eee; border-radius: 4px; }
+        .dot.active { background: var(--success-color); }
+        .action-buttons { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; }
+        .btn-action { border: none; padding: 15px 25px; border-radius: 50px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .btn-play { background: #ecf0f1; }
+        .btn-record { background: var(--primary-color); color: white; }
+        .btn-record.recording { background: #e74c3c; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+        .nav-buttons { display: flex; justify-content: space-between; width: 100%; margin-top: 20px; }
+        .btn-nav { background: none; border: 2px solid var(--primary-color); color: var(--primary-color); padding: 10px 20px; border-radius: var(--border-radius); cursor: pointer; font-weight: bold; }
+        footer { margin-top: auto; padding: 20px; font-size: 0.9em; color: #bdc3c7; }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <div class="progress-bar-container"><div id="global-progress"></div></div>
+        <div class="header-controls">
+            <span id="counter">1/21</span>
+            <button class="btn-reset" onclick="_0x5f21()">🔄 Reset</button>
+        </div>
+    </div>
+
+    <div class="slider-container" id="slider"></div>
+
+    <footer>Created by Jonas Freitas Goes</footer>
+
+    <script>
+        // 10151401190618050920011907150519
+        const _0x4a2e=["Hello, I'm John!","hélôu áim djón","Olá, eu sou o John!","What's your name?","uóts iórh nêim","Qual é o seu nome?","Welcome back!","uélkâm béak","Bem-vindos de volta!","I am excited!","ái éam ekisáitid","Eu estou empolgado!","It is great.","irêz grhêit","É legal / É ótimo.","I can't wait!","ái kéant uêit","Mal posso esperar!","Look at this.","lúk ét thís","Olhe para isso.","What is it?","uorízêt","O que é isso?","It's a cat.","its â kéat","É um gato.","It is blue.","irêz blú","É azul.","Color the dog.","kólorh thâ dóg","Pinte o cachorro.","It is green.","irêz grín","É verde.","Is it red?","is it rhéd","É vermelho?","Yes, it is.","iés irêz","Sim, é.","No, it isn't.","nôu it ísnt","Não, não é.","I like school.","ái laiks kul","Eu gosto da escola.","A yellow dress.","â iélôu drhés","Um vestido amarelo.","A red scarf.","â rhéd iscárhf","Um cachecol vermelho.","A white blouse.","â uáit bláus","Uma blusa branca.","Blue shorts.","blú xórhts","Short azul.","A green T-shirt.","â grín tí xârh t","Uma camiseta verde."];
+        let _0x1a2b = 0;
+        let _0x3c4d = new Array(21).fill(0);
+        const _0x9e8f = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        _0x9e8f.lang = 'en-US';
+        const _0x2d1c = window.speechSynthesis;
+        let _0x7a8b = false;
+
+        function _0x8f2d() {
+            const _0x01a2 = document.getElementById('slider');
+            for (let i = 0; i < 21; i++) {
+                const _0x33b1 = document.createElement('div');
+                _0x33b1.className = `card ${i === 0 ? 'active' : ''}`;
+                _0x33b1.innerHTML = `<div class="sentence-en">${_0x4a2e[i*3]}</div><div class="sentence-phonetic">${_0x4a2e[i*3+1]}</div><div class="sentence-pt">${_0x4a2e[i*3+2]}</div><div class="local-dots" id="dots-${i}"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div class="action-buttons"><button class="btn-action btn-play" onclick="_0x1122(${i})">🔊 Play</button><button class="btn-action btn-record" id="rec-${i}" onclick="_0x3344(${i})">🎙️ Record</button></div><div class="nav-buttons"><button class="btn-nav" onclick="_0xprev()">Previous</button><button class="btn-nav" onclick="_0xnext()">Next</button></div>`;
+                _0x01a2.appendChild(_0x33b1);
+            }
+            _0x99aa();
+        }
+
+        window._0x1122 = function(i) {
+            if(_0x7a8b) _0x9e8f.stop();
+            _0x2d1c.cancel();
+            const u = new SpeechSynthesisUtterance(_0x4a2e[i*3]);
+            u.lang = 'en-US'; u.rate = 0.85;
+            _0x2d1c.speak(u);
+        };
+
+        window._0x3344 = function(i) {
+            if (_0x7a8b) { _0x9e8f.stop(); } 
+            else { _0x2d1c.cancel(); _0x9e8f.start(); document.getElementById(`rec-${i}`).classList.add('recording'); _0x7a8b = true; }
+        };
+
+        _0x9e8f.onresult = (e) => {
+            const t = e.results[0][0].transcript.toLowerCase();
+            const g = _0x4a2e[_0x1a2b*3].toLowerCase().replace(/[!.?]/g, '');
+            if (_0xdist(t, g) >= 0.6) { if (_0x3c4d[_0x1a2b] < 3) { _0x3c4d[_0x1a2b]++; _0xupdD(); } }
+        };
+
+        _0x9e8f.onend = () => { document.querySelectorAll('.btn-record').forEach(b => b.classList.remove('recording')); _0x7a8b = false; };
+
+        function _0xdist(s1, s2) {
+            let l = s1.length < s2.length ? s2 : s1;
+            let s = s1.length < s2.length ? s1 : s2;
+            if (l.length == 0) return 1.0;
+            return (l.length - _0xced(l, s)) / parseFloat(l.length);
+        }
+
+        function _0xced(s1, s2) {
+            let c = new Array();
+            for (let i = 0; i <= s1.length; i++) {
+                let v = i;
+                for (let j = 0; j <= s2.length; j++) {
+                    if (i == 0) c[j] = j;
+                    else { if (j > 0) { let n = c[j - 1]; if (s1.charAt(i - 1) != s2.charAt(j - 1)) n = Math.min(Math.min(n, v), c[j]) + 1; c[j - 1] = v; v = n; } }
+                }
+                if (i > 0) c[s2.length] = v;
+            }
+            return c[s2.length];
+        }
+
+        function _0xupdD() {
+            const d = document.getElementById(`dots-${_0x1a2b}`).children;
+            for (let i = 0; i < _0x3c4d[_0x1a2b]; i++) d[i].classList.add('active');
+        }
+
+        function _0x99aa() {
+            document.querySelectorAll('.card').forEach((c, i) => c.classList.toggle('active', i === _0x1a2b));
+            document.getElementById('counter').innerText = `${_0x1a2b + 1}/21`;
+            document.getElementById('global-progress').style.width = `${((_0x1a2b + 1) / 21) * 100}%`;
+            _0xupdD();
+        }
+
+        window._0xnext = () => { if (_0x1a2b < 20) { _0x1a2b++; _0x99aa(); } };
+        window._0xprev = () => { if (_0x1a2b > 0) { _0x1a2b--; _0x99aa(); } };
+        window._0x5f21 = () => { if (confirm("Reiniciar progresso?")) location.reload(); };
+
+        _0x8f2d();
+    </script>
+</body>
+</html>

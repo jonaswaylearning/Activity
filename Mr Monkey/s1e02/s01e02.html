@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Practice - Mr. Monkey & Mr. Chameleon</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .intro {
+            background-color: #e8f0fe;
+            color: #1a73e8;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #d2e3fc;
+            max-width: 600px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .slider-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            overflow: hidden;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 0 0 20px 0;
+        }
+
+        .top-header {
+            display: flex;
+            align-items: center;
+            background-color: #ecf0f1;
+            height: 40px;
+            padding: 0 10px;
+            justify-content: space-between;
+        }
+
+        .progress-container {
+            flex-grow: 1;
+            background-color: #bdc3c7;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-right: 15px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #3498db;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .btn-reset {
+            background: none;
+            border: 1px solid #95a5a6;
+            color: #7f8c8d;
+            padding: 4px 8px;
+            font-size: 0.8em;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .slide-content {
+            padding: 20px;
+        }
+
+        .slide {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            animation: fadeIn 0.5s;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .context-box {
+            background-color: #fcf3cf;
+            border-left: 5px solid #f1c40f;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            color: #7d6608;
+            font-style: italic;
+            width: 90%;
+            text-align: left;
+            border-radius: 4px;
+        }
+
+        .english-text {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .phonetic-text {
+            font-size: 1.2em;
+            color: #d35400;
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+
+        .portuguese-text {
+            font-size: 1.1em;
+            color: #7f8c8d;
+            margin-bottom: 25px;
+        }
+
+        .stage-wrapper {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+            width: 150px;
+        }
+
+        .stage-segment {
+            flex: 1;
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .stage-segment.completed {
+            background-color: #27ae60;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        button.action-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-play { background-color: #3498db; }
+        .btn-slow { background-color: #f1c40f; color: #2c3e50 !important; }
+        .btn-record { background-color: #e74c3c; }
+        .btn-record.recording { animation: pulse 1.5s infinite; }
+
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+
+        .btn-nav {
+            background-color: #ecf0f1;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .result {
+            margin-top: 15px;
+            font-weight: bold;
+            min-height: 24px;
+            text-align: center;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #95a5a6;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="intro">
+        Acesse o link pelo navegador Chrome. Clique em (▶️ Play) para ouvir, em (🐢 Slow) para ouvir mais lentamente e em (🔴 Record) para treinar a sua pronúncia. Repita cada item com no mínimo 60% da pronúncia correta, por três vezes.
+    </div>
+
+    <div class="slider-container">
+        <div class="top-header">
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <button class="btn-reset" onclick="resetLesson()">🔄 Reset</button>
+        </div>
+
+        <div class="slide-content">
+            <div id="slides-wrapper"></div>
+            <div class="result" id="result-msg"></div>
+
+            <div class="nav-controls">
+                <button class="btn-nav" onclick="changeSlide(-1)">⬅️ Previous</button>
+                <span class="counter" id="slide-counter">1 / 7</span>
+                <button class="btn-nav" onclick="changeSlide(1)">Next ➡️</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>Created by Jonas Freitas Goes</footer>
+
+    <script>
+        // 10151401190618050920011907150519
+
+        const sentences = [
+            { en: "Who could it be?", pt: "Quem será?", phonetic: "Rhú cúd it bí?", context: "Curiosidade ao ouvir a campainha da garagem tocar." },
+            { en: "Hello, Mr. Monkey!", pt: "Olá, Sr. Macaco!", phonetic: "Rhélôu Místerh Mânqui!", context: "Um cumprimento alegre ao chegar na oficina." },
+            { en: "Now I'm red.", pt: "Agora estou vermelho.", phonetic: "Náu áim rhéd.", context: "O Sr. Camaleão mudou de cor e está achando isso engraçado." },
+            { en: "Let's see...", pt: "Vejamos...", phonetic: "Lets sí...", context: "O Sr. Macaco está pensando em como resolver o problema." },
+            { en: "Wait!", pt: "Espere!", phonetic: "Uêit!", context: "Alguém percebeu algo importante e pediu para parar." },
+            { en: "Ready?", pt: "Pronto?", phonetic: "Rhédi?", context: "Pergunta animada para saber se todos estão preparados." },
+            { en: "See you!", pt: "Até a próxima!", phonetic: "Sí iú!", context: "Uma despedida amigável ao final do encontro." }
+        ];
+
+        let currentSlide = 0;
+        let recognition;
+        let isRecording = false;
+        let slideProgress = new Array(sentences.length).fill(0);
+
+        function init() {
+            const wrapper = document.getElementById('slides-wrapper');
+            sentences.forEach((item, index) => {
+                const slide = document.createElement('div');
+                slide.className = `slide ${index === 0 ? 'active' : ''}`;
+                slide.innerHTML = `
+                    <div class="context-box"><strong>Contexto:</strong> ${item.context}</div>
+                    <div class="english-text">${item.en}</div>
+                    <div class="phonetic-text">${item.phonetic}</div>
+                    <div class="portuguese-text">${item.pt}</div>
+                    <div class="stage-wrapper" id="stage-wrapper-${index}">
+                        <div class="stage-segment"></div>
+                        <div class="stage-segment"></div>
+                        <div class="stage-segment"></div>
+                    </div>
+                    <div class="controls">
+                        <button class="action-btn btn-play" onclick="playAudio('${item.en.replace(/'/g, "\\'")}', 1)">▶️ Play</button>
+                        <button class="action-btn btn-slow" onclick="playAudio('${item.en.replace(/'/g, "\\'")}', 0.5)">🐢 Slow</button>
+                        <button class="action-btn btn-record" id="rec-btn-${index}" onclick="toggleRecording(${index})">🔴 Record</button>
+                    </div>
+                `;
+                wrapper.appendChild(slide);
+            });
+            updateUI();
+            setupSpeechRecognition();
+        }
+
+        function resetLesson() {
+            if(confirm("Reiniciar todo o progresso?")) {
+                currentSlide = 0;
+                slideProgress.fill(0);
+                document.querySelectorAll('.stage-segment').forEach(seg => seg.classList.remove('completed'));
+                changeSlide(0);
+                updateUI();
+            }
+        }
+
+        function changeSlide(dir) {
+            const slides = document.querySelectorAll('.slide');
+            slides[currentSlide].classList.remove('active');
+            speechSynthesis.cancel();
+            if (isRecording) recognition.stop();
+            currentSlide = (currentSlide + dir + sentences.length) % sentences.length;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('result-msg').textContent = "";
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('slide-counter').textContent = `${currentSlide + 1} / ${sentences.length}`;
+            const progress = ((currentSlide + 1) / sentences.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+        }
+
+        function updateStageVisuals(idx) {
+            const segments = document.getElementById(`stage-wrapper-${idx}`).querySelectorAll('.stage-segment');
+            segments.forEach((seg, i) => {
+                i < slideProgress[idx] ? seg.classList.add('completed') : seg.classList.remove('completed');
+            });
+        }
+
+        function playAudio(text, rate) {
+            speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'en-US';
+            u.rate = rate;
+            speechSynthesis.speak(u);
+        }
+
+        function setupSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window) {
+                recognition = new webkitSpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.onstart = () => {
+                    isRecording = true;
+                    document.getElementById(`rec-btn-${currentSlide}`).classList.add('recording');
+                };
+                recognition.onend = () => {
+                    isRecording = false;
+                    document.getElementById(`rec-btn-${currentSlide}`).classList.remove('recording');
+                };
+                recognition.onresult = (event) => {
+                    const spoken = event.results[0][0].transcript;
+                    checkPronunciation(spoken);
+                };
+            }
+        }
+
+        function toggleRecording(idx) {
+            speechSynthesis.cancel();
+            isRecording ? recognition.stop() : recognition.start();
+        }
+
+        function checkPronunciation(spoken) {
+            const target = sentences[currentSlide].en.toLowerCase().replace(/[^\w\s]/gi, '');
+            const input = spoken.toLowerCase().replace(/[^\w\s]/gi, '');
+            const score = calculateSimilarity(input, target);
+            const msg = document.getElementById('result-msg');
+            
+            if (score >= 0.6) {
+                if (slideProgress[currentSlide] < 3) {
+                    slideProgress[currentSlide]++;
+                    updateStageVisuals(currentSlide);
+                }
+                msg.innerHTML = `<span style="color: #27ae60">✅ Correct: "${spoken}"</span>`;
+            } else {
+                msg.innerHTML = `<span style="color: #c0392b">❌ Try again: "${spoken}"</span>`;
+            }
+        }
+
+        function calculateSimilarity(s1, s2) {
+            let longer = s1.length >= s2.length ? s1 : s2;
+            let shorter = s1.length < s2.length ? s1 : s2;
+            if (longer.length === 0) return 1.0;
+            return (longer.length - editDistance(longer, shorter)) / parseFloat(longer.length);
+        }
+
+        function editDistance(s1, s2) {
+            const costs = [];
+            for (let i = 0; i <= s1.length; i++) {
+                let last = i;
+                for (let j = 0; j <= s2.length; j++) {
+                    if (i === 0) costs[j] = j;
+                    else if (j > 0) {
+                        let current = costs[j - 1];
+                        if (s1.charAt(i - 1) !== s2.charAt(j - 1))
+                            current = Math.min(Math.min(current, last), costs[j]) + 1;
+                        costs[j - 1] = last; last = current;
+                    }
+                }
+                if (i > 0) costs[s2.length] = last;
+            }
+            return costs[s2.length];
+        }
+
+        init();
+    </script>
+</body>
+</html>
