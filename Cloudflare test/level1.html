@@ -162,6 +162,20 @@ let isRecording = false;
 let slideProgress = [];
 let recognition;
 
+/* 🔊 iOS FIX — force English voice */
+let englishVoice = null;
+
+function loadVoices() {
+    const voices = speechSynthesis.getVoices();
+    englishVoice =
+        voices.find(v => v.lang === 'en-US') ||
+        voices.find(v => v.lang.startsWith('en')) ||
+        null;
+}
+
+speechSynthesis.onvoiceschanged = loadVoices;
+loadVoices();
+
 const STORAGE_KEY = 'jonas_way_mastery_brazilian';
 
 fetch("https://level1.jonasfgoes.workers.dev/")
@@ -239,12 +253,18 @@ function restoreDots() {
 }
 
 function playAudio(text, rate) {
-    if (isRecording) return; // 🚫 bloqueia TTS enquanto o mic está ativo
+    if (isRecording) return;
 
     speechSynthesis.cancel();
+
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-US';
     utterance.rate = rate;
+
+    if (englishVoice) {
+        utterance.voice = englishVoice;
+    }
+
     speechSynthesis.speak(utterance);
 }
 
