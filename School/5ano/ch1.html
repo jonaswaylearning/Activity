@@ -156,16 +156,26 @@
 <footer class="mt-6 text-gray-400 text-xs">Jonas Way English - Mastery Method v6.0</footer>
 
 <script>
+    // ==================================================
+// JONAS WAY — CONFIG (REQUIRED)
+// ==================================================
+const LESSON_ID  = '5anoch1';
+const WORKER_URL = 'https://5anoch1.jonasfgoes.workers.dev/';
+
+if (
+  LESSON_ID === 'new_lesson' ||
+  WORKER_URL === 'new_worker_url'
+) {
+  throw new Error(
+    'CONFIG NOT SET: Replace LESSON_ID and WORKER_URL'
+  );
+}
+
 let sentences = [];
 let currentIndex = 0;
 let isRecording = false;
 let slideProgress = [];
 let recognition;
-// ==================================================
-// JONAS WAY — LESSON ID (MUST BE UNIQUE)
-// ==================================================
-const LESSON_ID = '5anoch1';
-
 
 /* 🔊 iOS FIX — force English voice */
 let englishVoice = null;
@@ -183,7 +193,10 @@ loadVoices();
 
 const STORAGE_KEY = `jonas_way_mastery_${LESSON_ID}`;
 
-fetch("https://5anoch1.jonasfgoes.workers.dev/")
+// ⚠️ WORKFLOW RULE
+// Never hardcode backend URLs.
+// Always use WORKER_URL from CONFIG.
+fetch(WORKER_URL)
   .then(res => res.json())
   .then(data => {
     sentences = data;
@@ -563,5 +576,6 @@ function showCardBanner(text, className) {
 </script>
 </body>
 </html>
+
 
 
