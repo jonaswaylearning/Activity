@@ -344,8 +344,7 @@ function checkPronunciation(spokenText) {
             currentDot.classList.add('active', 'pop-success');
 
             // 🏆 Card mastered
-            if (slideProgress[currentIndex] === 3) {
-                cardContainer.classList.add('mastery-achieved');
+            if (slideProgress[currentIndex] === 3) {                
                 playMasterySound();
                 showCardBanner('CLEAR!', 'banner-clear');
             }
