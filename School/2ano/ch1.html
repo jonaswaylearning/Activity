@@ -156,6 +156,21 @@
 <footer class="mt-6 text-gray-400 text-xs">Jonas Way English - Mastery Method v6.0</footer>
 
 <script>
+    // ==================================================
+// JONAS WAY — CONFIG (REQUIRED)
+// ==================================================
+const LESSON_ID  = '2anoch1';
+const WORKER_URL = 'https://2anoch1.jonasfgoes.workers.dev/';
+
+if (
+  LESSON_ID === 'new_lesson' ||
+  WORKER_URL === 'new_worker_url'
+) {
+  throw new Error(
+    'CONFIG NOT SET: Replace LESSON_ID and WORKER_URL'
+  );
+}
+
 let sentences = [];
 let currentIndex = 0;
 let isRecording = false;
@@ -176,9 +191,12 @@ function loadVoices() {
 speechSynthesis.onvoiceschanged = loadVoices;
 loadVoices();
 
-const STORAGE_KEY = 'jonas_way_mastery_brazilian';
+const STORAGE_KEY = `jonas_way_mastery_${LESSON_ID}`;
 
-fetch("https://2anoch1.jonasfgoes.workers.dev/")
+// ⚠️ WORKFLOW RULE
+// Never hardcode backend URLs.
+// Always use WORKER_URL from CONFIG.
+fetch(WORKER_URL)
   .then(res => res.json())
   .then(data => {
     sentences = data;
@@ -318,7 +336,7 @@ function checkPronunciation(spokenText) {
 
             const today = new Date().toISOString().split('T')[0];
             const data = JSON.parse(
-                localStorage.getItem(`jonas_way_card_points_${today}`) || '{}'
+            localStorage.getItem(`jonas_way_card_points_${LESSON_ID}_${today}`) || '{}'
             );
 
             // 🌟 Reinforcement milestone (6th success)
@@ -339,8 +357,7 @@ function checkPronunciation(spokenText) {
             currentDot.classList.add('active', 'pop-success');
 
             // 🏆 Card mastered
-            if (slideProgress[currentIndex] === 3) {
-                cardContainer.classList.add('mastery-achieved');
+            if (slideProgress[currentIndex] === 3) {                
                 playMasterySound();
                 showCardBanner('CLEAR!', 'banner-clear');
             }
@@ -510,22 +527,25 @@ function showPointPulse(cardIndex) {
 function addPointToday() {
     const today = new Date().toISOString().split('T')[0];
 
-    const lastDate = localStorage.getItem('jonas_way_points_date');
-    let points = parseInt(localStorage.getItem('jonas_way_points_today') || '0', 10);
+    const dateKey   = `jonas_way_points_date_${LESSON_ID}`;
+    const pointsKey = `jonas_way_points_today_${LESSON_ID}`;
 
-    // 🔄 Midnight reset
+    const lastDate = localStorage.getItem(dateKey);
+    let points = parseInt(localStorage.getItem(pointsKey) || '0', 10);
+
+    // 🔄 Midnight reset (por lição)
     if (lastDate !== today) {
         points = 0;
-        localStorage.setItem('jonas_way_points_date', today);
+        localStorage.setItem(dateKey, today);
     }
 
     points += 1;
-    localStorage.setItem('jonas_way_points_today', points);
+    localStorage.setItem(pointsKey, points);
 }
 
-function canEarnPoint(cardIndex) {
+    function canEarnPoint(cardIndex) {
     const today = new Date().toISOString().split('T')[0];
-    const key = `jonas_way_card_points_${today}`;
+    const key = `jonas_way_card_points_${LESSON_ID}_${today}`;
     const data = JSON.parse(localStorage.getItem(key) || '{}');
 
     const pointsToday = data[cardIndex] || 0;
@@ -534,7 +554,7 @@ function canEarnPoint(cardIndex) {
 
 function registerCardPoint(cardIndex) {
     const today = new Date().toISOString().split('T')[0];
-    const key = `jonas_way_card_points_${today}`;
+    const key = `jonas_way_card_points_${LESSON_ID}_${today}`;
     const data = JSON.parse(localStorage.getItem(key) || '{}');
 
     data[cardIndex] = (data[cardIndex] || 0) + 1;
@@ -556,7 +576,6 @@ function showCardBanner(text, className) {
 </script>
 </body>
 </html>
-
 
 
 
