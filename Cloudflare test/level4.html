@@ -7,14 +7,68 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+    /* 🏆 CARD STATUS BANNERS */
+.card-banner {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 26px;
+    border-radius: 999px;
+    font-weight: 900;
+    font-size: 1.15rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    pointer-events: none;
+    animation: bannerPop 1.4s ease-out forwards;
+    z-index: 5;
+}
+.banner-clear {
+    background: linear-gradient(135deg, #facc15, #f59e0b);
+    color: #78350f;
+    box-shadow: 0 0 25px rgba(251, 191, 36, 0.6);
+}
+
+.banner-reinforced {
+    background: linear-gradient(135deg, #fde68a, #fbbf24);
+    color: #713f12;
+    box-shadow: 0 0 18px rgba(251, 191, 36, 0.45);
+}
+
+@keyframes bannerPop {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.6);
+    }
+    15% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1.1);
+    }
+    70% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-12px) scale(0.95);
+    }
+}
+    
         body { font-family: 'Inter', sans-serif; background: #f3f4f6; -webkit-tap-highlight-color: transparent; }
-        .card { display: none; }
-        .card.active { display: block; }
+.card {
+    display: none;
+    position: relative;
+}
+
+.card.active {
+    display: block;
+}
         .grammar-tag { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; }
         .type-affirmative { color: #059669; }
         .type-negative { color: #dc2626; }
         .type-interrogative { color: #2563eb; }
 
+        /* --- ENGINE DE ANIMAÇÕES --- */
         .recording-pulse { animation: pulse 1.2s infinite; color: #ef4444; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
 
@@ -30,6 +84,45 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
         button:active { transform: scale(0.92); }
+        /* 🎉 PARTY ANIMATION */
+.confetti {
+    position: fixed;
+    top: -10px;
+    width: 8px;
+    height: 14px;
+    opacity: 0.9;
+    animation: fall linear forwards;
+    z-index: 9999;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(110vh) rotate(360deg);
+    }
+}
+   .point-pulse {
+    position: absolute;
+    color: #10b981;
+    font-weight: 700;
+    font-size: 1.4rem;
+    animation: pointFloat 1.2s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes pointFloat {
+    0% {
+        opacity: 0;
+        transform: translateY(0) scale(0.9);
+    }
+    20% {
+        opacity: 1;
+        transform: translateY(-6px) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-16px) scale(1.05);
+    }
+}
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -45,7 +138,7 @@
               d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
     </button>
-</div>
+  </div>
 
 <div id="slider-container" class="mastery-card w-full max-w-md bg-white rounded-b-xl shadow-lg p-6 md:p-8 min-h-[500px] flex flex-col justify-between">
     <div id="cards-wrapper"></div>
@@ -63,15 +156,47 @@
 <footer class="mt-6 text-gray-400 text-xs">Jonas Way English - Mastery Method v6.0</footer>
 
 <script>
+    // ==================================================
+// JONAS WAY — CONFIG (REQUIRED)
+// ==================================================
+const LESSON_ID  = 'new_lesson';
+const WORKER_URL = 'new_worker_url';
+
+if (
+  LESSON_ID === 'level4' ||
+  WORKER_URL === 'https://level4.jonasfgoes.workers.dev/'
+) {
+  throw new Error(
+    'CONFIG NOT SET: Replace LESSON_ID and WORKER_URL'
+  );
+}
+
 let sentences = [];
 let currentIndex = 0;
 let isRecording = false;
 let slideProgress = [];
 let recognition;
 
-const STORAGE_KEY = 'jonas_way_mastery_level4_do_my_best';
+/* 🔊 iOS FIX — force English voice */
+let englishVoice = null;
 
-fetch("https://level4.jonasfgoes.workers.dev/")
+function loadVoices() {
+    const voices = speechSynthesis.getVoices();
+    englishVoice =
+        voices.find(v => v.lang === 'en-US') ||
+        voices.find(v => v.lang.startsWith('en')) ||
+        null;
+}
+
+speechSynthesis.onvoiceschanged = loadVoices;
+loadVoices();
+
+const STORAGE_KEY = `jonas_way_mastery_${LESSON_ID}`;
+
+// ⚠️ WORKFLOW RULE
+// Never hardcode backend URLs.
+// Always use WORKER_URL from CONFIG.
+fetch(WORKER_URL)
   .then(res => res.json())
   .then(data => {
     sentences = data;
@@ -146,12 +271,18 @@ function restoreDots() {
 }
 
 function playAudio(text, rate) {
-    if (isRecording) return; // 🚫 bloqueia TTS enquanto o mic está ativo
+    if (isRecording) return;
 
     speechSynthesis.cancel();
+
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-US';
     utterance.rate = rate;
+
+    if (englishVoice) {
+        utterance.voice = englishVoice;
+    }
+
     speechSynthesis.speak(utterance);
 }
 
@@ -179,47 +310,91 @@ function toggleRecording(i) {
 
 function checkPronunciation(spokenText) {
     const target = sentences[currentIndex].en;
-    const score = calculateSimilarity(spokenText.toLowerCase(), target.toLowerCase());
+
+    const cleanSpoken = spokenText
+        .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "")
+        .toLowerCase();
+
+    const cleanTarget = target
+        .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "")
+        .toLowerCase();
+
+    const score = calculateSimilarity(cleanSpoken, cleanTarget);
+
     const msg = document.getElementById('result-msg');
     const cardContainer = document.getElementById('slider-container');
     const displaySpoken = `"${spokenText}"`;
 
+    /* ✅ SUCCESS */
     if (score >= 0.75) {
 
-        // ✅ Progress only if not mastered yet
+        /* 🎯 POINT SYSTEM (max 6 per card / day) */
+        if (canEarnPoint(currentIndex)) {
+            showPointPulse(currentIndex);
+            addPointToday();
+            registerCardPoint(currentIndex);
+
+            const today = new Date().toISOString().split('T')[0];
+            const data = JSON.parse(
+            localStorage.getItem(`jonas_way_card_points_${LESSON_ID}_${today}`) || '{}'
+            );
+
+            // 🌟 Reinforcement milestone (6th success)
+            if (data[currentIndex] === 6) {
+                setTimeout(() => {
+                showCardBanner('REINFORCED!', 'banner-reinforced');
+                }, 500);    
+            }
+        }
+
+        /* 🧠 MASTERY PROGRESSION (only until 3) */
         if (slideProgress[currentIndex] < 3) {
             slideProgress[currentIndex]++;
+
             const currentDot = document.getElementById(
                 `step-${currentIndex}-${slideProgress[currentIndex]}`
             );
             currentDot.classList.add('active', 'pop-success');
 
-            if (slideProgress[currentIndex] === 3) {
-                cardContainer.classList.add('mastery-achieved');
+            // 🏆 Card mastered
+            if (slideProgress[currentIndex] === 3) {                
                 playMasterySound();
+                showCardBanner('CLEAR!', 'banner-clear');
             }
 
-            saveProgress();
+            // 🎉 All cards mastered
+            if (slideProgress.every(p => p === 3)) {
+                partyAnimation();
+            }
         }
 
-        // ✅ Feedback ALWAYS shown
-        msg.innerHTML = `
-          <div class="feedback-entry">
-            <div class="text-green-500 text-xl font-bold">✅ ${displaySpoken}</div>
-            <div class="text-gray-400 text-[10px] uppercase tracking-widest mt-1">
-              Matched with ${Math.round(score * 100)}% accuracy
-            </div>
-          </div>`;
+        saveProgress();
 
-    } else {
-        // ❌ Failure feedback always shown
+        /* ✅ SUCCESS FEEDBACK (always shown) */
         msg.innerHTML = `
-          <div class="feedback-entry">
-            <div class="text-red-500 text-xl font-bold">❌ ${displaySpoken}</div>
-            <div class="text-gray-400 text-[10px] uppercase tracking-widest mt-1 italic">
-              Try one more time!
+            <div class="feedback-entry">
+                <div class="text-green-500 text-xl font-bold">
+                    ✅ ${displaySpoken}
+                </div>
+                <div class="text-gray-400 text-[10px] uppercase tracking-widest mt-1">
+                    Matched with ${Math.round(score * 100)}% accuracy
+                </div>
             </div>
-          </div>`;
+        `;
+
+    } 
+    /* ❌ FAILURE */
+    else {
+        msg.innerHTML = `
+            <div class="feedback-entry">
+                <div class="text-red-500 text-xl font-bold">
+                    ❌ ${displaySpoken}
+                </div>
+                <div class="text-gray-400 text-[10px] uppercase tracking-widest mt-1 italic">
+                    Try one more time!
+                </div>
+            </div>
+        `;
     }
 
     updateUI();
@@ -265,14 +440,6 @@ function calculateSimilarity(s1, s2) {
 }
 
 function updateUI() {
-    const container = document.getElementById('slider-container');
-
-    if (slideProgress[currentIndex] === 3) {
-        container.classList.add('mastery-achieved');
-    } else {
-        container.classList.remove('mastery-achieved');
-    }
-
     document.querySelectorAll('.card').forEach((c, i) =>
         c.classList.toggle('active', i === currentIndex)
     );
@@ -286,8 +453,15 @@ function updateUI() {
 
     document.getElementById('counter').innerText =
       `Card ${currentIndex + 1} of ${sentences.length}`;
-}
 
+    // 🔒 ESTADO VISUAL ÚNICO (regra global)
+    const container = document.getElementById('slider-container');
+    if (slideProgress[currentIndex] === 3) {
+        container.classList.add('mastery-achieved');
+    } else {
+        container.classList.remove('mastery-achieved');
+    }
+}
 function changeSlide(dir) {
     currentIndex = (currentIndex + dir + sentences.length) % sentences.length;
     document.getElementById('result-msg').innerText = "";
@@ -313,6 +487,96 @@ function confirmReset() {
         updateUI();
     }
 }
+function partyAnimation() {
+    for (let i = 0; i < 120; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.backgroundColor =
+            ['#f43f5e', '#facc15', '#22c55e', '#3b82f6', '#a855f7']
+            [Math.floor(Math.random() * 5)];
+        confetti.style.animationDuration = (2 + Math.random() * 2) + 's';
+        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+        document.body.appendChild(confetti);
+
+        setTimeout(() => confetti.remove(), 4000);
+    }
+}
+function showPointPulse(cardIndex) {
+    const card = document.querySelector('.card.active');
+    if (!card) return;
+
+    const mic = document.getElementById(`mic-icon-${cardIndex}`);
+    if (!mic) return;
+
+    const pulse = document.createElement('div');
+    pulse.className = 'point-pulse';
+    pulse.innerText = '+1';
+
+    // position relative to the card
+    const micRect = mic.getBoundingClientRect();
+    const cardRect = card.getBoundingClientRect();
+
+    pulse.style.left = (micRect.left - cardRect.left + 20) + 'px';
+    pulse.style.top  = (micRect.top  - cardRect.top  - 10) + 'px';
+
+    card.appendChild(pulse);
+
+    setTimeout(() => pulse.remove(), 800);
+}
+function addPointToday() {
+    const today = new Date().toISOString().split('T')[0];
+
+    const dateKey   = `jonas_way_points_date_${LESSON_ID}`;
+    const pointsKey = `jonas_way_points_today_${LESSON_ID}`;
+
+    const lastDate = localStorage.getItem(dateKey);
+    let points = parseInt(localStorage.getItem(pointsKey) || '0', 10);
+
+    // 🔄 Midnight reset (por lição)
+    if (lastDate !== today) {
+        points = 0;
+        localStorage.setItem(dateKey, today);
+    }
+
+    points += 1;
+    localStorage.setItem(pointsKey, points);
+}
+
+    function canEarnPoint(cardIndex) {
+    const today = new Date().toISOString().split('T')[0];
+    const key = `jonas_way_card_points_${LESSON_ID}_${today}`;
+    const data = JSON.parse(localStorage.getItem(key) || '{}');
+
+    const pointsToday = data[cardIndex] || 0;
+    return pointsToday < 6; // 👈 HARD CAP
+}
+
+function registerCardPoint(cardIndex) {
+    const today = new Date().toISOString().split('T')[0];
+    const key = `jonas_way_card_points_${LESSON_ID}_${today}`;
+    const data = JSON.parse(localStorage.getItem(key) || '{}');
+
+    data[cardIndex] = (data[cardIndex] || 0) + 1;
+    localStorage.setItem(key, JSON.stringify(data));
+}
+
+function showCardBanner(text, className) {
+    const card = document.querySelector('.card.active');
+    if (!card) return;
+
+    const banner = document.createElement('div');
+    banner.className = `card-banner ${className}`;
+    banner.innerText = text;
+
+    card.appendChild(banner);
+    setTimeout(() => banner.remove(), 1500);
+}
+
 </script>
 </body>
 </html>
+
+
+
+
