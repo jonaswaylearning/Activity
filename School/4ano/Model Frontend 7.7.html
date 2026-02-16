@@ -201,8 +201,8 @@
     // ==================================================
 // JONAS WAY — CONFIG (REQUIRED)
 // ==================================================
-const LESSON_ID  = '1anoch1';
-const WORKER_URL = 'https://1anoch1.jonasfgoes.workers.dev/';
+const LESSON_ID  = '2anoch1';
+const WORKER_URL = 'https://2anoch1.jonasfgoes.workers.dev/';
 
 if (
   LESSON_ID === 'new_lesson' ||
@@ -357,15 +357,11 @@ function toggleRecording(i) {
 function checkPronunciation(spokenText) {
     const target = sentences[currentIndex].en;
 
-    const cleanSpoken = spokenText
-        .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "")
-        .toLowerCase();
-
-    const cleanTarget = target
-        .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "")
-        .toLowerCase();
+    const cleanSpoken = normalize(spokenText);
+    const cleanTarget = normalize(target);
 
     const score = calculateSimilarity(cleanSpoken, cleanTarget);
+    const shownScore = score >= 0.95 ? 100 : Math.round(score * 100);
 
     const msg = document.getElementById('result-msg');
     const cardContainer = document.getElementById('slider-container');
@@ -650,6 +646,13 @@ function playHallelujah() {
     audio.play().catch(() => {
         // mobile browsers may block autoplay — silently fail
     });
+}
+function normalize(str) {
+  return str
+    .toLowerCase()
+    .replace(/[^a-z\s]/g, "") // remove punctuation & apostrophes
+    .replace(/\s+/g, " ")     // collapse multiple spaces
+    .trim();
 }
 
 </script>
