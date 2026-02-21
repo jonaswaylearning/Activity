@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Weekly Classes">
+  <title>Weekly classes</title>
+  <style>
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    body { background: #f5f7fb; margin: 0; padding: 0; display: flex; justify-content: center; min-height: 100vh; }
+    #app { max-width: 600px; width: 100%; background: white; box-shadow: 0 0 30px rgba(0,0,0,0.05); padding: 1rem; margin: 0; min-height: 100vh; }
+    h1 { font-size: 2rem; margin: 0 0 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .toolbar { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    button { background: #edf2f7; border: none; border-radius: 40px; padding: 0.7rem 1.3rem; font-size: 0.95rem; font-weight: 500; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.02); touch-action: manipulation; }
+    button.primary { background: #1e3c72; color: white; }
+    button.warning { background: #b91c1c; color: white; }
+    button.small { padding: 0.3rem 0.9rem; font-size: 0.8rem; border-radius: 30px; }
+    button.danger { background: #fde7e9; color: #a11f2b; }
+    .menu-bar { display: flex; gap: 0.4rem; margin: 1rem 0; flex-wrap: wrap; background: #f0f4fa; padding: 0.6rem; border-radius: 60px; justify-content: center; }
+    .menu-btn { background: transparent; border: none; border-radius: 40px; padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; color: #2c3e50; }
+    .menu-btn.active { background: #1e3c72; color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    .class-card { background: #ffffff; border-left: 6px solid #2b6f9b; border-radius: 24px; padding: 1rem; margin: 1.2rem 0; box-shadow: 0 8px 16px rgba(0,0,0,0.03); }
+    .home-class { border-left-color: #c95d0e; }
+    .class-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+    .class-title { font-weight: 700; font-size: 1.3rem; display: flex; gap: 0.7rem; align-items: center; }
+    .badge { font-size: 0.75rem; background: #ccc; padding: 0.25rem 0.9rem; border-radius: 30px; text-transform: uppercase; font-weight: 600; }
+    .badge.school { background: #2b6f9b; color: white; }
+    .badge.home { background: #c95d0e; color: white; }
+    .meta { color: #2c3e50; font-weight: 500; font-size: 0.95rem; margin: 0.5rem 0; }
+    .plan-block { background: #f8fcff; border-radius: 18px; padding: 0.9rem; margin: 0.9rem 0; border: 1px solid #d4e0ec; }
+    .plan-header { font-weight: 600; font-size: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+    .delete-plan-btn { background: #f1b6b6; color: #9b1c1c; border: none; border-radius: 30px; padding: 0.2rem 1rem; font-size: 0.75rem; font-weight: bold; }
+    .activity-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0; border-bottom: 1px solid #e0eaf2; flex-wrap: wrap; }
+    .activity-item input[type="checkbox"] { width: 1.3rem; height: 1.3rem; }
+    .activity-text { flex: 1; font-size: 0.95rem; min-width: 120px; }
+    .minutes-badge { background: #d9e2ed; border-radius: 30px; padding: 0.2rem 0.9rem; font-size: 0.8rem; font-weight: 600; }
+    .add-activity { display: flex; gap: 0.4rem; margin-top: 0.7rem; flex-wrap: wrap; }
+    .add-activity input { flex: 2; min-width: 130px; padding: 0.5rem 1rem; border: 1px solid #bdd3e8; border-radius: 40px; }
+    .history-section { margin-top: 2.5rem; border-top: 3px solid #9bb7d4; padding-top: 0.8rem; }
+    .history-header { background: #d9e2ef; padding: 0.8rem 1.5rem; border-radius: 60px; text-align: center; font-weight: 700; font-size: 1.2rem; cursor: pointer; user-select: none; }
+    .history-content { padding: 0.5rem 0; transition: 0.2s; }
+    .collapsed { display: none; }
+    .clickable-line { background: #f0f7fe; border-radius: 50px; padding: 0.5rem 1.2rem; margin: 0.6rem 0; display: flex; align-items: center; justify-content: space-between; cursor: pointer; font-weight: 500; border: 1px solid #b9d1e9; }
+    .edit-panel { background: #ffffff; border: 2px solid #2b6f9b; border-radius: 28px; padding: 1rem; margin: 0.8rem 0; }
+    .edit-panel input, .edit-panel select { width: 100%; padding: 0.6rem; margin: 0.3rem 0; border-radius: 40px; border: 1px solid #b0c9e0; }
+    .import-export { margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; margin-bottom: 1rem; }
+    .picker-row { display: flex; align-items: center; gap: 0.5rem; background: #eaf0f9; padding: 0.5rem 1rem; border-radius: 60px; margin: 0.5rem 0; }
+    .picker-row select { flex: 1; padding: 0.6rem; border-radius: 40px; border: 1px solid #b0c4de; background: white; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <h1>📚 Weekly classes</h1>
+  <div class="toolbar">
+    <button class="primary" id="addClassBtn">+ Add class</button>
+    <button id="simulate3amBtn" class="warning">⏰ Simulate 3 AM (move plans)</button>
+  </div>
+
+  <!-- main menu for views -->
+  <div class="menu-bar" id="menuBar">
+    <button class="menu-btn active" data-view="all">All</button>
+    <button class="menu-btn" data-view="school">School</button>
+    <button class="menu-btn" data-view="home">Home</button>
+    <button class="menu-btn" data-view="weekorder">Week order</button>
+    <button class="menu-btn" data-view="individual">Individual</button>
+    <button class="menu-btn" data-view="day">By day</button>
+  </div>
+
+  <!-- individual class picker (visible only when individual view selected) -->
+  <div id="individualPicker" style="display: none;" class="picker-row">
+    <span>👤 Pick class:</span>
+    <select id="individualClassSelect"></select>
+  </div>
+
+  <!-- day picker for "by day" view -->
+  <div id="dayPicker" style="display: none;" class="picker-row">
+    <span>📅 Select day:</span>
+    <select id="daySelect">
+      <option value="monday">Monday</option>
+      <option value="tuesday">Tuesday</option>
+      <option value="wednesday">Wednesday</option>
+      <option value="thursday">Thursday</option>
+      <option value="friday">Friday</option>
+      <option value="saturday">Saturday</option>
+      <option value="sunday">Sunday</option>
+    </select>
+  </div>
+
+  <!-- current classes container -->
+  <div id="classesContainer"></div>
+
+  <!-- history section -->
+  <div class="history-section" id="historySection">
+    <div class="history-header" id="historyToggle">📂 History (tap to open/close)</div>
+    <div class="history-content collapsed" id="historyContent"></div>
+  </div>
+
+  <!-- import/export -->
+  <div class="import-export">
+    <button id="importBtn">📤 Import data</button>
+    <button id="exportBtn">📥 Export data</button>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ---------- data ----------
+    let classes = [];          // current classes (always remain, plans come and go)
+    let historyPlans = [];      // archived plans: each entry { classId, className, classType, day, time, plan } 
+    let nextId = 200;
+    let nextPlanId = 1000;
+    let nextActivityId = 5000;
+    let currentView = 'all';    
+    let historyCollapsed = true;
+    let individualClassId = null;
+    let selectedDay = 'monday';
+
+    // helpers
+    function getDayIndex(day) { return ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'].indexOf(day.toLowerCase()); }
+    function formatDate(d) { return d.toISOString().split('T')[0]; }
+
+    // next non‑planned date for class (based on its weekday)
+    function getNextPlanDate(classObj) {
+      const dayMap = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+      const targetDay = classObj.day.toLowerCase();
+      let targetIdx = dayMap.indexOf(targetDay);
+      if (targetIdx === -1) targetIdx = 1; 
+      let latestDate = null;
+      if (classObj.plans && classObj.plans.length) {
+        const dates = classObj.plans.map(p => new Date(p.date + 'T12:00:00')).filter(d => !isNaN(d));
+        if (dates.length) latestDate = new Date(Math.max(...dates));
+      }
+      const baseDate = latestDate || new Date();
+      const candidate = new Date(baseDate);
+      candidate.setDate(baseDate.getDate() + 1);
+      while (candidate.getDay() !== targetIdx) candidate.setDate(candidate.getDate() + 1);
+      return candidate;
+    }
+
+    // create plan for class
+    function createPlan(classId, planDate) {
+      const classObj = classes.find(c => c.id === classId);
+      if (!classObj) return;
+      const dateStr = planDate instanceof Date ? formatDate(planDate) : planDate;
+      const newPlan = { id: nextPlanId++, date: dateStr, activities: [] };
+      classObj.plans.push(newPlan);
+      renderAll();
+    }
+
+    // add class plan (uses next non planned)
+    function addClassPlanHandler(classId) {
+      const classObj = classes.find(c => c.id === classId);
+      if (!classObj) return;
+      const nextDate = getNextPlanDate(classObj);
+      createPlan(classId, nextDate);
+    }
+
+    // delete class plan (and move it to history? No: delete permanently. But requirement: "When moving to history, the class plans should go but the created classes should remain" → we have a separate 3am move that pushes plans to historyPlans and removes from class)
+    function deletePlan(classId, planId) {
+      if (!confirm(`Delete this plan permanently?`)) return;
+      const classObj = classes.find(c => c.id === classId);
+      if (classObj) {
+        classObj.plans = classObj.plans.filter(p => p.id !== planId);
+        renderAll();
+      }
+    }
+
+    // delete activity
+    function deleteActivity(classId, planId, activityId) {
+      if (!confirm(`Remove activity?`)) return;
+      const classObj = classes.find(c => c.id === classId);
+      if (!classObj) return;
+      const plan = classObj.plans.find(p => p.id === planId);
+      if (!plan) return;
+      plan.activities = plan.activities.filter(a => a.id !== activityId);
+      renderAll();
+    }
+
+    // delete class with three confirmations (keeps in history? no, complete removal)
+    function deleteClass(classId) {
+      const classObj = classes.find(c => c.id === classId);
+      if (!classObj) return;
+      if (!confirm(`⚠️ Delete class "${classObj.name}"?`)) return;
+      if (!confirm(`Are you 100% sure? This will remove class and all its plans.`)) return;
+      if (!confirm(`Final confirmation: delete "${classObj.name}"?`)) return;
+      classes = classes.filter(c => c.id !== classId);
+      // also remove any history plans linked to this class?
+      historyPlans = historyPlans.filter(h => h.classId !== classId);
+      if (individualClassId === classId) {
+        individualClassId = classes.length ? classes[0].id : null;
+      }
+      renderAll();
+    }
+
+    // 3am move: moves all plans from current classes to historyPlans, then clears plans from classes
+    function movePlansToHistory() {
+      if (classes.length === 0) return;
+      classes.forEach(c => {
+        if (c.plans && c.plans.length) {
+          c.plans.forEach(p => {
+            // store a copy in history
+            historyPlans.push({
+              classId: c.id,
+              className: c.name,
+              classType: c.type,
+              day: c.day,
+              time: c.time,
+              plan: { ...p, activities: p.activities.map(a => ({ ...a })) }
+            });
+          });
+          // clear plans from class
+          c.plans = [];
+        }
+      });
+      renderAll();
+    }
+
+    // ---------- rendering ----------
+    function renderClassCard(c, showPlans = true) {
+      const isHome = c.type === 'home';
+      let html = `<div class="class-card ${isHome ? 'home-class' : ''}" data-class-id="${c.id}">
+        <div class="class-header">
+          <div class="class-title">
+            <span>${c.name}</span>
+            <span class="badge ${c.type}">${c.type}</span>
+          </div>
+          <div>
+            <button class="small" data-class-edit="${c.id}">✎ line</button>
+            <button class="small warning" data-class-delete="${c.id}">🗑</button>
+          </div>
+        </div>
+        <div class="meta">${c.day} · ${c.time}</div>`;
+
+      if (showPlans) {
+        html += `<div class="plans-area">`;
+        (c.plans || []).forEach(p => {
+          html += `<div class="plan-block" data-plan-id="${p.id}">
+            <div class="plan-header">
+              <span>📅 ${p.date}</span>
+              <div>
+                <button class="delete-plan-btn small" data-delete-plan="${c.id},${p.id}">✖ delete plan</button>
+                <button class="small" data-add-activity="${c.id},${p.id}">+ act</button>
+              </div>
+            </div>`;
+          p.activities.forEach(a => {
+            html += `<div class="activity-item">
+              <input type="checkbox" ${a.done ? 'checked' : ''} data-toggle-activity="${c.id},${p.id},${a.id}">
+              <span class="activity-text">${a.text}</span>
+              <span class="minutes-badge">${a.minutes} min</span>
+              <button class="small danger" data-delete-activity="${c.id},${p.id},${a.id}">✕</button>
+            </div>`;
+          });
+          html += `<div class="add-activity" data-plan-activities="${c.id},${p.id}" style="display:none;">
+            <input type="text" placeholder="activity" class="new-act-text-${c.id}-${p.id}">
+            <input type="number" placeholder="min" class="new-act-min-${c.id}-${p.id}" value="30" min="1" style="width:75px;">
+            <button class="small" data-save-activity="${c.id},${p.id}">add</button>
+          </div>`;
+          html += `</div>`;
+        });
+        html += `</div>`;
+        html += `<button class="small primary" data-add-classplan="${c.id}">➕ add class plan</button>`;
+      } else {
+        html += `<div class="plans-area"><p class="text-small">(no plans in main view)</p></div>`;
+      }
+
+      html += `<div class="clickable-line" data-toggle-detail="${c.id}">👆 Click to edit details</div>`;
+      html += `<div class="edit-panel" id="detail-${c.id}" style="display:none;">
+        <label>Name: <input type="text" id="edit-name-${c.id}" value="${c.name}"></label>
+        <label>Day: <input type="text" id="edit-day-${c.id}" value="${c.day}"></label>
+        <label>Time: <input type="text" id="edit-time-${c.id}" value="${c.time}"></label>
+        <label>Type: 
+          <select id="edit-type-${c.id}">
+            <option value="school" ${c.type==='school'?'selected':''}>school</option>
+            <option value="home" ${c.type==='home'?'selected':''}>home</option>
+          </select>
+        </label>
+        <button class="small" data-save-detail="${c.id}">Save details</button>
+      </div>`;
+      html += `</div>`;
+      return html;
+    }
+
+    function renderClasses() {
+      const container = document.getElementById('classesContainer');
+      let filtered = classes;
+
+      if (currentView === 'school') filtered = classes.filter(c => c.type === 'school');
+      else if (currentView === 'home') filtered = classes.filter(c => c.type === 'home');
+      else if (currentView === 'weekorder') {
+        const dayOrder = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+        filtered = [...classes].sort((a,b) => {
+          const dayA = dayOrder.indexOf(a.day.toLowerCase());
+          const dayB = dayOrder.indexOf(b.day.toLowerCase());
+          if (dayA !== dayB) return dayA - dayB;
+          return a.time.localeCompare(b.time);
+        });
+      } else if (currentView === 'individual') {
+        if (individualClassId) filtered = classes.filter(c => c.id === individualClassId);
+        else filtered = [];
+      } else if (currentView === 'day') {
+        filtered = classes.filter(c => c.day.toLowerCase() === selectedDay.toLowerCase());
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<p style="color:#888; padding:1rem;">No classes match.</p>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(c => renderClassCard(c, true)).join('');
+    }
+
+    function renderHistory() {
+      const cont = document.getElementById('historyContent');
+      if (historyCollapsed) cont.classList.add('collapsed'); else cont.classList.remove('collapsed');
+      if (!historyPlans.length) { cont.innerHTML = '<p style="padding:1rem;">No history plans.</p>'; return; }
+
+      let filtered = historyPlans;
+      if (currentView === 'school') filtered = historyPlans.filter(h => h.classType === 'school');
+      else if (currentView === 'home') filtered = historyPlans.filter(h => h.classType === 'home');
+      else if (currentView === 'weekorder') {
+        const dayOrder = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+        filtered = [...historyPlans].sort((a,b) => {
+          const dayA = dayOrder.indexOf(a.day.toLowerCase());
+          const dayB = dayOrder.indexOf(b.day.toLowerCase());
+          if (dayA !== dayB) return dayA - dayB;
+          return a.time.localeCompare(b.time);
+        });
+      }
+
+      if (filtered.length === 0) { cont.innerHTML = '<p>No history for filter</p>'; return; }
+
+      // group by class? simpler: list each plan with class name
+      cont.innerHTML = filtered.map(h => `
+        <div class="plan-block" style="margin:0.5rem 0;">
+          <div class="plan-header"><strong>${h.className}</strong> (${h.classType}) · ${h.day} ${h.time}</div>
+          <div>📅 ${h.plan.date}</div>
+          ${h.plan.activities.map(a => `
+            <div class="activity-item">
+              <input type="checkbox" ${a.done ? 'checked' : ''} disabled>
+              <span class="activity-text">${a.text}</span>
+              <span class="minutes-badge">${a.minutes} min</span>
+            </div>`).join('')}
+          <div class="text-small" style="margin-top:0.3rem;">📜 history item (read‑only)</div>
+        </div>`).join('');
+    }
+
+    function updatePickers() {
+      document.getElementById('individualPicker').style.display = (currentView === 'individual') ? 'flex' : 'none';
+      document.getElementById('dayPicker').style.display = (currentView === 'day') ? 'flex' : 'none';
+      if (currentView === 'individual' && classes.length) {
+        const select = document.getElementById('individualClassSelect');
+        select.innerHTML = classes.map(c => `<option value="${c.id}" ${c.id === individualClassId ? 'selected' : ''}>${c.name} (${c.day})</option>`).join('');
+      }
+    }
+
+    function renderAll() {
+      renderClasses();
+      renderHistory();
+      updatePickers();
+      bindEvents();
+    }
+
+    // ----- event binding -----
+    function bindEvents() {
+      document.querySelectorAll('.menu-btn').forEach(btn => {
+        btn.removeEventListener('click', menuHandler);
+        btn.addEventListener('click', menuHandler);
+      });
+
+      document.querySelectorAll('[data-class-delete]').forEach(el => {
+        el.removeEventListener('click', (e) => { const id = Number(e.target.dataset.classDelete); deleteClass(id); });
+        el.addEventListener('click', (e) => { const id = Number(e.target.dataset.classDelete); deleteClass(id); });
+      });
+
+      document.querySelectorAll('[data-add-classplan]').forEach(el => {
+        el.removeEventListener('click', (e) => addClassPlanHandler(Number(e.target.dataset.addClassplan)));
+        el.addEventListener('click', (e) => addClassPlanHandler(Number(e.target.dataset.addClassplan)));
+      });
+
+      document.querySelectorAll('[data-delete-plan]').forEach(el => {
+        el.removeEventListener('click', (e) => { e.stopPropagation(); const [cid, pid] = e.target.dataset.deletePlan.split(','); deletePlan(Number(cid), Number(pid)); });
+        el.addEventListener('click', (e) => { e.stopPropagation(); const [cid, pid] = e.target.dataset.deletePlan.split(','); deletePlan(Number(cid), Number(pid)); });
+      });
+
+      document.querySelectorAll('[data-add-activity]').forEach(el => {
+        el.removeEventListener('click', (e) => { e.preventDefault(); const planBlock = e.target.closest('.plan-block'); if(planBlock) planBlock.querySelector('.add-activity').style.display = 'flex'; });
+        el.addEventListener('click', (e) => { e.preventDefault(); const planBlock = e.target.closest('.plan-block'); if(planBlock) planBlock.querySelector('.add-activity').style.display = 'flex'; });
+      });
+
+      document.querySelectorAll('[data-save-activity]').forEach(el => {
+        el.removeEventListener('click', saveActivityHandler);
+        el.addEventListener('click', saveActivityHandler);
+      });
+
+      document.querySelectorAll('[data-toggle-detail]').forEach(el => {
+        el.removeEventListener('click', (e) => { const id = e.target.dataset.toggleDetail; const panel = document.getElementById(`detail-${id}`); if(panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'none'; });
+        el.addEventListener('click', (e) => { const id = e.target.dataset.toggleDetail; const panel = document.getElementById(`detail-${id}`); if(panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'none'; });
+      });
+
+      document.querySelectorAll('[data-save-detail]').forEach(el => {
+        el.removeEventListener('click', saveDetailHandler);
+        el.addEventListener('click', saveDetailHandler);
+      });
+
+      document.querySelectorAll('[data-toggle-activity]').forEach(el => {
+        el.removeEventListener('change', toggleActivityDone);
+        el.addEventListener('change', toggleActivityDone);
+      });
+
+      document.querySelectorAll('[data-delete-activity]').forEach(el => {
+        el.removeEventListener('click', deleteActivityHandler);
+        el.addEventListener('click', deleteActivityHandler);
+      });
+
+      document.getElementById('historyToggle').addEventListener('click', (e) => {
+        historyCollapsed = !historyCollapsed;
+        renderAll();
+      });
+
+      document.getElementById('individualClassSelect')?.addEventListener('change', (e) => {
+        individualClassId = Number(e.target.value);
+        renderAll();
+      });
+
+      document.getElementById('daySelect')?.addEventListener('change', (e) => {
+        selectedDay = e.target.value;
+        renderAll();
+      });
+    }
+
+    function menuHandler(e) {
+      document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      currentView = e.target.dataset.view;
+      if (currentView === 'individual' && classes.length && !individualClassId) individualClassId = classes[0].id;
+      renderAll();
+    }
+
+    function saveActivityHandler(e) {
+      const ids = e.target.dataset.saveActivity.split(',');
+      const classId = Number(ids[0]), planId = Number(ids[1]);
+      let classObj = classes.find(c => c.id === classId);
+      if (!classObj) return;
+      const plan = classObj.plans.find(p => p.id === planId);
+      if (!plan) return;
+      const textInp = document.querySelector(`.new-act-text-${classId}-${planId}`);
+      const minInp = document.querySelector(`.new-act-min-${classId}-${planId}`);
+      const text = textInp?.value.trim();
+      const minutes = parseInt(minInp?.value) || 30;
+      if (!text) { alert('enter activity'); return; }
+      plan.activities.push({ id: nextActivityId++, text, done: false, minutes });
+      if (textInp) textInp.value = '';
+      renderAll();
+    }
+
+    function saveDetailHandler(e) {
+      const classId = Number(e.target.dataset.saveDetail);
+      let classObj = classes.find(c => c.id === classId);
+      if (!classObj) return;
+      classObj.name = document.getElementById(`edit-name-${classId}`).value;
+      classObj.day = document.getElementById(`edit-day-${classId}`).value;
+      classObj.time = document.getElementById(`edit-time-${classId}`).value;
+      classObj.type = document.getElementById(`edit-type-${classId}`).value;
+      renderAll();
+    }
+
+    function toggleActivityDone(e) {
+      const ids = e.target.dataset.toggleActivity.split(',');
+      const classId = Number(ids[0]), planId = Number(ids[1]), actId = Number(ids[2]);
+      const classObj = classes.find(c => c.id === classId);
+      if (!classObj) return;
+      const plan = classObj.plans.find(p => p.id === planId);
+      if (!plan) return;
+      const act = plan.activities.find(a => a.id === actId);
+      if (act) act.done = e.target.checked;
+    }
+
+    function deleteActivityHandler(e) {
+      e.stopPropagation();
+      const [classIdStr, planIdStr, actIdStr] = e.target.dataset.deleteActivity.split(',');
+      deleteActivity(Number(classIdStr), Number(planIdStr), Number(actIdStr));
+    }
+
+    // ----- add class button -----
+    document.getElementById('addClassBtn').addEventListener('click', () => {
+      let type = prompt('Add class: type "school" or "home"?');
+      if (type === null) return;
+      if (type !== 'school' && type !== 'home') { alert('please type school or home'); return; }
+      let name = prompt('Class name?');
+      if (!name) return;
+      let day = prompt('Day of week (e.g., Monday)?');
+      if (!day) return;
+      let time = prompt('Start time (e.g., 10:30)?');
+      if (!time) return;
+      classes.push({ id: nextId++, name, type, day, time, plans: [] });
+      if (!individualClassId && classes.length) individualClassId = classes[0].id;
+      renderAll();
+    });
+
+    document.getElementById('simulate3amBtn').addEventListener('click', () => {
+      if (confirm('Simulate 3 AM: move all current plans to history?')) movePlansToHistory();
+    });
+
+    // import/export
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      const data = { classes, historyPlans };
+      const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'weekly-classes-backup.json'; a.click();
+    });
+
+    document.getElementById('importBtn').addEventListener('click', () => {
+      const input = document.createElement('input'); input.type = 'file'; input.accept = 'application/json';
+      input.onchange = e => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try {
+            const data = JSON.parse(ev.target.result);
+            classes = data.classes || [];
+            historyPlans = data.historyPlans || [];
+            nextId = Math.max(...classes.map(c=>c.id), 200) + 1;
+            if (classes.length) individualClassId = classes[0].id;
+            renderAll();
+          } catch { alert('Invalid file'); }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    });
+
+    // init demo data
+    (function init() {
+      if (classes.length === 0) {
+        const id1 = nextId++; classes.push({ id: id1, name: 'Math', type: 'school', day: 'Monday', time: '09:00', plans: [] });
+        const id2 = nextId++; classes.push({ id: id2, name: 'Physics', type: 'school', day: 'Wednesday', time: '11:00', plans: [] });
+        const id3 = nextId++; classes.push({ id: id3, name: 'Spanish', type: 'home', day: 'Tuesday', time: '18:30', plans: [] });
+        individualClassId = id1;
+      }
+      renderAll();
+    })();
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+{
+  "classes": [
+    {
+      "day": "Monday",
+      "id": "17717091435826ce25",
+      "name": "2m",
+      "time": "08:00",
+      "type": "home",
+      "plans": []
+    },
+    {
+      "day": "Monday",
+      "id": "1771713582476tltrb",
+      "name": "2t",
+      "time": "14:00",
+      "type": "home",
+      "plans": []
+    },
+    {
+      "day": "Monday",
+      "id": "1771713590960i2p3x",
+      "name": "2n",
+      "time": "19:00",
+      "type": "home",
+      "plans": []
+    },
+    {
+      "day": "Tuesday",
+      "id": "1771713623070rwm2o",
+      "name": "G4",
+      "time": "08:30",
+      "type": "school",
+      "plans": []
+    },
+    {
+      "day": "Tuesday",
+      "id": "1771713635808wkay0",
+      "name": "G3",
+      "time": "09:00",
+      "type": "school",
+      "plans": []
+    },
+    {
+      "day": "Tuesday",
+      "id": "1771713669844kvxsf",
+      "name": "5º ano",
+      "time": "10:15",
+      "type": "school",
+      "plans": []
+    },
+    {
+      "day": "Tuesday",
+      "id": "17717136771225u5at",
+      "name": "4º ano",
+      "time": "11:05",
+      "type": "school",
+      "plans": []
+    },
+    {
+      "day": "Tuesday",
+      "id": "1771713702671ihmy6",
+      "name": "3t",
+      "time": "14:00",
+      "type": "home",
+      "plans": []
+    },
+    {
+      "day": "Tuesday",
+      "id": "17717137156422b671",
+      "name": "3n",
+      "time": "19:00",
+      "type": "home",
+      "plans": []
+    },
+    {
+      "day": "Wednesday",
+      "id": "1771713748557sbdpl",
+      "name": "3ºA",
+      "time": "08:00",
+      "type": "school",
+      "plans": []
+    },
+    {
+      "day": "Wednesday",
+      "id": "17717137611842puyq",
+      "name": "3ºB",
+      "time": "09:00",
+      "type": "school",
+      "plans": []
+    },
+    {
+      "day": "Wednesday",
+      "id": "1771713790262b1oda",
+      "name": "2ºAno",
+      "time": "11:00",
+      "type": "school",
+      "plans": []
+    },
+    {
+      "day": "Wednesday",
+      "id": "177171380046016kdc",
+      "name": "4t",
+      "time": "14:00",
+      "type": "home",
+      "plans": []
+    },
+    {
+      "day": "Wednesday",
+      "id": "1771713807778a03zv",
+      "name": "4n",
+      "time": "19:00",
+      "type": "home",
+      "plans": []
+    },
+    {
+      "day": "Thursday",
+      "id": "1771713894170v1mw9",
+      "name": "1ºA",
+      "time": "08:00",
+      "type": "school",
+      "plans": []
+    },
+    {
+      "day": "Thursday",
+      "id": "1771713901165xzj6n",
+      "name": "1ºB",
+      "time": "09:00",
+      "type": "school",
+      "plans": []
+    },
+    {
+      "day": "Thursday",
+      "id": "1771713914936n7fi2",
+      "name": "G2",
+      "time": "10:40",
+      "type": "school",
+      "plans": []
+    },
+    {
+      "day": "Thursday",
+      "id": "1771713929124t2z5e",
+      "name": "G5",
+      "time": "11:10",
+      "type": "school",
+      "plans": []
+    },
+    {
+      "day": "Thursday",
+      "id": "1771714059438ewj96",
+      "name": "5n",
+      "time": "19:00",
+      "type": "home",
+      "plans": []
+    }
+  ],
+  "presets": []
+}

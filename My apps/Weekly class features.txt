@@ -1,0 +1,43 @@
+I want to create an html file that allows me to plan my weekly classes.
+The file should be able to save data on local storage
+
+I have classes in school and classes at home, so I want the app to allow me to display school classes only, home classes only ,classes in the order they happen throughout the week, individual class, classes by day of the week and activity presets.
+A menu should allow me to do the selection
+When I chhose individual class display, there shuld be a way for me to pick what class I want to be displayed
+There must be a title "Weekly classes"
+There must be a field to add a the different classes.
+The classes should be added as school or home clases and the app should ask before adding.
+The app should ask te name of the class, day of the week and time it starts before adding class
+When a class is added, an "add class plan" button should be added inside of each class,
+When "add class plan" button is clicked, create a new class plan section inside that class. The class plan section should be dated after the next non planned date considering the day of the week of that class.
+That being said, we should have different classes and different class plans inside each class
+There should be a "delete class plan" button inside each class plan.
+there should also be an option to delete a class after the class is added. 
+There should be 3 confirmation prompts after deleting a class.
+Inside eache class, there should be the option to add activities.
+There should be an expand button on each activity that allows user to see te details about each activity
+It should be possible to edit the activities after they've been added.
+It sould be possible to change the activities order inside a plan by dragging them.
+There should also be a button to delete activities.
+There should be a global section that allows create to activity presets
+When user clicks in the "+ act" button, he should be asked if he wants to add a preset activity or a new one.
+If user clicks on preset activity, a list of presets should be displayed.
+Presets activities can be customized in the class plan but the changes shuld be only applied too that specific plan, not to the preset.
+Next to each activity, there should be a checkbox so I canmark the activities that i did an the oned I didn't do.
+Next to each activity, there should be a time lenght and number will be displayed in minutes.
+The current week classes should be displayed in lines and it should be possible to clck on the line to see and edit details of the class
+Everyday, at 03:00 am, the previous classes shoud be moved to a "history section"
+When moving to history, the class plans should go but the created classes should remain in the main tab
+This history section should be closed and it will only open when I click on it.
+The classes displayed in history should follow the selected display option for the classes.
+It should be possible to edit the plans even after they've been moved to history.
+The app should be mobile friendly and behave like an app on smartphones and here's an example:
+
+ <!-- Mobile & PWA -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Weekly Classes">
+
+There shoud be a button to import data and a button to export data.
