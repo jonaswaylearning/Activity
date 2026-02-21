@@ -4,9 +4,15 @@
       "day": "Monday",
       "id": "17717091435826ce25",
       "name": "2m",
+      "plans": [
+        {
+          "date": "2026-02-23",
+          "id": "1771714270407goeza",
+          "activities": []
+        }
+      ],
       "time": "08:00",
-      "type": "home",
-      "plans": []
+      "type": "home"
     },
     {
       "day": "Monday",
@@ -153,5 +159,30 @@
       "plans": []
     }
   ],
-  "presets": []
+  "presets": [
+    {
+      "details": "Students suggest music and we watch lyrics video.",
+      "duration": 20,
+      "id": "1771714354226og190",
+      "name": "Suggestions of music"
+    },
+    {
+      "details": "- Watch Lyric video of the song\n- Practice pronunciation with translation on the side.\n- Sing by parts\n- Sing the whole thing",
+      "duration": 45,
+      "id": "1771714458486fkfx1",
+      "name": "Learn a song"
+    },
+    {
+      "details": "- Practice the sentences from card set with all the class.\n- Students practicein thei phones\n- We watch the episode or video",
+      "duration": 40,
+      "id": "1771714589258yv7f7",
+      "name": "JW Videos"
+    },
+    {
+      "details": "-One person taks the hotseat\n-Students set a name on the projector\n- The person should find out the name by asking yes/no questions only.",
+      "duration": 25,
+      "id": "17717146939646smz4",
+      "name": "Guess who"
+    }
+  ]
 }
