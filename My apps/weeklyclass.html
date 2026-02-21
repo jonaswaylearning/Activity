@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Weekly Classes">
+  <title>Weekly classes</title>
+  
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+
+  <style>
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    body { background: #f5f7fb; margin: 0; padding: 0; display: flex; justify-content: center; min-height: 100vh; padding-bottom: 90px; overscroll-behavior-y: none; }
+    #app { max-width: 600px; width: 100%; background: white; box-shadow: 0 0 30px rgba(0,0,0,0.05); padding: 1.5rem 1rem; margin: 0; min-height: 100vh; position: relative; }
+    h1 { font-size: 2rem; margin: 0 0 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    
+    button { background: #edf2f7; border: none; border-radius: 40px; padding: 0.7rem 1.3rem; font-size: 0.95rem; font-weight: 500; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.02); touch-action: manipulation; transition: 0.2s; }
+    button:active { transform: scale(0.97); }
+    button.primary { background: #1e3c72; color: white; }
+    button.warning { background: #b91c1c; color: white; }
+    button.small { padding: 0.3rem 0.7rem; font-size: 0.8rem; border-radius: 30px; }
+    button.danger { background: #fde7e9; color: #a11f2b; }
+    
+    .menu-bar { display: flex; gap: 0.4rem; margin: 1rem 0; flex-wrap: wrap; background: #f0f4fa; padding: 0.6rem; border-radius: 30px; justify-content: center; }
+    .menu-btn { background: transparent; border: none; border-radius: 40px; padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; color: #2c3e50; }
+    .menu-btn.active { background: #1e3c72; color: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    
+    .class-card { background: #ffffff; border-left: 6px solid #2b6f9b; border-radius: 24px; padding: 1rem; margin: 1.2rem 0; box-shadow: 0 8px 16px rgba(0,0,0,0.04); }
+    .home-class { border-left-color: #c95d0e; }
+    .class-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+    .class-title { font-weight: 700; font-size: 1.3rem; display: flex; gap: 0.7rem; align-items: center; }
+    
+    .badge { font-size: 0.75rem; background: #ccc; padding: 0.25rem 0.9rem; border-radius: 30px; text-transform: uppercase; font-weight: 600; }
+    .badge.school { background: #2b6f9b; color: white; }
+    .badge.home { background: #c95d0e; color: white; }
+    .meta { color: #2c3e50; font-weight: 500; font-size: 0.95rem; margin: 0.5rem 0; }
+    
+    .plan-block { background: #f8fcff; border-radius: 18px; padding: 0.9rem; margin: 0.9rem 0; border: 1px solid #d4e0ec; }
+    .plan-header { font-weight: 600; font-size: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 0.5rem; gap: 5px; }
+    .delete-plan-btn { background: #f1b6b6; color: #9b1c1c; border: none; }
+    
+    .activity-list { display: flex; flex-direction: column; gap: 4px; }
+    .activity-item { display: flex; flex-direction: column; background: white; border: 1px solid #e0eaf2; border-radius: 12px; transition: opacity 0.2s; overflow: hidden; }
+    .activity-main { display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem; width: 100%; flex-wrap: wrap; }
+    .activity-main input[type="checkbox"] { width: 1.3rem; height: 1.3rem; accent-color: #1e3c72; }
+    .activity-text { flex: 1; font-size: 0.95rem; min-width: 100px; font-weight: 500; }
+    .minutes-badge { background: #d9e2ed; border-radius: 30px; padding: 0.2rem 0.7rem; font-size: 0.8rem; font-weight: 600; }
+    .activity-details { padding: 0.5rem 0.8rem; background: #f0f4fa; font-size: 0.85rem; color: #444; border-top: 1px solid #e0eaf2; white-space: pre-wrap; display: none; }
+    
+    .drag-handle { cursor: grab; padding: 0 5px; color: #a0aec0; font-size: 1.2rem; user-select: none; touch-action: none; }
+    .drag-handle:active { cursor: grabbing; }
+    
+    .history-section { margin-top: 2.5rem; border-top: 3px solid #9bb7d4; padding-top: 1.2rem; }
+    .history-header { background: #d9e2ef; padding: 0.8rem 1.5rem; border-radius: 60px; text-align: center; font-weight: 700; font-size: 1.1rem; cursor: pointer; user-select: none; }
+    .history-content { padding: 0.5rem 0; transition: 0.2s; }
+    
+    details > summary { list-style: none; cursor: pointer; }
+    details > summary::-webkit-details-marker { display: none; }
+    .clickable-line { background: #f0f7fe; border-radius: 50px; padding: 0.6rem 1.2rem; margin: 0.8rem 0 0 0; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 600; color: #2b6f9b; font-size: 0.9rem; border: 1px solid #b9d1e9; }
+    .edit-panel { background: #ffffff; border-radius: 20px; padding: 1rem; margin-top: 0.5rem; border: 1px dashed #b0c9e0; }
+    .edit-panel label { display: block; font-size: 0.85rem; font-weight: 600; color: #555; margin-bottom: 0.5rem; }
+    .edit-panel input, .edit-panel select, .edit-panel textarea { width: 100%; padding: 0.6rem; margin-top: 0.2rem; border-radius: 12px; border: 1px solid #b0c9e0; background: #f9fbfd; font-family: inherit; }
+    
+    .import-export { margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; margin-bottom: 1rem; }
+    .picker-row { display: flex; align-items: center; gap: 0.5rem; background: #eaf0f9; padding: 0.5rem 1rem; border-radius: 60px; margin: 0.5rem 0; font-weight: 600; color: #2c3e50; }
+    .picker-row select { flex: 1; padding: 0.6rem; border-radius: 40px; border: 1px solid #b0c4de; background: white; outline: none; }
+    
+    dialog { border: none; border-radius: 24px; padding: 20px; width: 90%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); background: white; }
+    dialog::backdrop { background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); }
+    .dialog-form { display: flex; flex-direction: column; gap: 12px; }
+    .dialog-form h3 { margin: 0 0 10px 0; color: #1e3c72; }
+    .dialog-form label { font-weight: bold; font-size: 0.9rem; color: #444; }
+    .dialog-form input, .dialog-form select, .dialog-form textarea { width: 100%; padding: 10px; margin-top: 4px; border: 1px solid #ccc; border-radius: 12px; font-size: 1rem; font-family: inherit; }
+    .dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px; }
+    .radio-group { display: flex; gap: 15px; background: #f0f4fa; padding: 10px; border-radius: 12px; }
+    .radio-group label { font-weight: normal; display: flex; align-items: center; gap: 5px; cursor: pointer; }
+
+    .fab { position: fixed; bottom: 25px; right: max(25px, calc(50vw - 280px)); width: 65px; height: 65px; border-radius: 50%; font-size: 32px; font-weight: normal; display: flex; align-items: center; justify-content: center; background: #1e3c72; color: white; box-shadow: 0 6px 16px rgba(30,60,114,0.4); z-index: 1000; transition: transform 0.2s; }
+    .fab:active { transform: scale(0.9); }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <h1>📚 Weekly classes</h1>
+
+  <div class="menu-bar" id="menuBar">
+    <button class="menu-btn active" onclick="setView('all')">All</button>
+    <button class="menu-btn" onclick="setView('school')">School</button>
+    <button class="menu-btn" onclick="setView('home')">Home</button>
+    <button class="menu-btn" onclick="setView('weekorder')">Week order</button>
+    <button class="menu-btn" onclick="setView('individual')">Individual</button>
+    <button class="menu-btn" onclick="setView('day')">By day</button>
+    <button class="menu-btn" onclick="setView('presets')">Presets</button>
+  </div>
+
+  <div id="main-view">
+    <div id="individualPicker" class="picker-row" style="display: none;">
+      <span>👤 Pick class:</span>
+      <select id="individualClassSelect" onchange="renderApp()"></select>
+    </div>
+
+    <div id="dayPicker" class="picker-row" style="display: none;">
+      <span>📅 Select day:</span>
+      <select id="daySelect" onchange="renderApp()">
+        <option value="Monday">Monday</option><option value="Tuesday">Tuesday</option><option value="Wednesday">Wednesday</option>
+        <option value="Thursday">Thursday</option><option value="Friday">Friday</option><option value="Saturday">Saturday</option><option value="Sunday">Sunday</option>
+      </select>
+    </div>
+
+    <div id="current-classes"></div>
+
+    <div class="history-section">
+      <details id="history-details">
+        <summary class="history-header">📂 History (tap to open)</summary>
+        <div class="history-content" id="history-content"></div>
+      </details>
+    </div>
+  </div>
+
+  <div id="presets-view" style="display: none;">
+    <h2 style="color: #1e3c72; text-align: center;">Activity Presets</h2>
+    <p style="text-align: center; font-size: 0.9rem; color: #555;">Create standard activities here. They can be customized individually when added to a plan.</p>
+    <button class="primary" style="width: 100%; margin-bottom: 15px;" onclick="openPresetDialog()">+ Add New Preset</button>
+    <div id="presets-container"></div>
+  </div>
+
+  <div class="import-export">
+    <button onclick="document.getElementById('import-file').click()">📤 Import</button>
+    <button onclick="exportData()">📥 Export</button>
+    <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importData(event)">
+  </div>
+</div>
+
+<button class="fab" id="main-fab" onclick="document.getElementById('class-dialog').showModal()">+</button>
+
+<dialog id="class-dialog">
+  <div class="dialog-form">
+    <h3>Add New Class</h3>
+    <label>Type:<select id="new-class-type"><option value="school">School</option><option value="home">Home</option></select></label>
+    <label>Class Name:<input type="text" id="new-class-name" placeholder="e.g. Mathematics"></label>
+    <label>Day of the Week:
+      <select id="new-class-day">
+        <option value="Monday">Monday</option><option value="Tuesday">Tuesday</option><option value="Wednesday">Wednesday</option>
+        <option value="Thursday">Thursday</option><option value="Friday">Friday</option><option value="Saturday">Saturday</option><option value="Sunday">Sunday</option>
+      </select>
+    </label>
+    <label>Start Time:<input type="time" id="new-class-time" required></label>
+    <div class="dialog-actions">
+      <button class="danger" onclick="document.getElementById('class-dialog').close()">Cancel</button>
+      <button class="primary" onclick="addClass()">Add Class</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="add-act-dialog">
+  <div class="dialog-form">
+    <h3>Add Activity</h3>
+    <input type="hidden" id="add-act-class-id"><input type="hidden" id="add-act-plan-id">
+    <div class="radio-group">
+      <label><input type="radio" name="actSource" value="new" checked onchange="toggleAddActMode()"> New</label>
+      <label><input type="radio" name="actSource" value="preset" onchange="toggleAddActMode()"> Preset</label>
+    </div>
+    <div id="act-new-fields">
+      <label>Name:<input type="text" id="add-act-name" placeholder="Activity name"></label>
+      <label>Duration (min):<input type="number" id="add-act-duration" placeholder="e.g. 30"></label>
+      <label>Details:<textarea id="add-act-details" placeholder="Descriptions..." rows="3"></textarea></label>
+    </div>
+    <div id="act-preset-fields" style="display: none;">
+      <label>Select Preset:<select id="add-act-preset-select"></select></label>
+    </div>
+    <div class="dialog-actions">
+      <button class="danger" onclick="document.getElementById('add-act-dialog').close()">Cancel</button>
+      <button class="primary" onclick="saveNewActivity()">Add</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="edit-act-dialog">
+  <div class="dialog-form">
+    <h3>Edit Activity</h3>
+    <input type="hidden" id="edit-act-class-id"><input type="hidden" id="edit-act-plan-id"><input type="hidden" id="edit-act-id">
+    <label>Name:<input type="text" id="edit-act-name"></label>
+    <label>Duration (min):<input type="number" id="edit-act-duration"></label>
+    <label>Details:<textarea id="edit-act-details" rows="3"></textarea></label>
+    <div class="dialog-actions">
+      <button class="danger" onclick="document.getElementById('edit-act-dialog').close()">Cancel</button>
+      <button class="primary" onclick="saveEditedActivity()">Save</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="preset-dialog">
+  <div class="dialog-form">
+    <h3 id="preset-dialog-title">Add Preset</h3>
+    <input type="hidden" id="preset-id">
+    <label>Name:<input type="text" id="preset-name"></label>
+    <label>Duration (min):<input type="number" id="preset-duration"></label>
+    <label>Details:<textarea id="preset-details" rows="3"></textarea></label>
+    <div class="dialog-actions">
+      <button class="danger" onclick="document.getElementById('preset-dialog').close()">Cancel</button>
+      <button class="primary" onclick="savePreset()">Save</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  // ==========================================
+  // FIREBASE CONFIGURATION 
+  // ==========================================
+  const firebaseConfig = {
+    apiKey: "AIzaSyCbGkc6D2CNYLib1j2VfZMj_Ac-iS0K4zk",
+    authDomain: "weeklyclassesapp.firebaseapp.com",
+    databaseURL: "https://weeklyclassesapp-default-rtdb.firebaseio.com", 
+    projectId: "weeklyclassesapp",
+    storageBucket: "weeklyclassesapp.firebasestorage.app",
+    messagingSenderId: "370576800213",
+    appId: "1:370576800213:web:37575ef143a03ce292655c"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const dbRef = db.ref('weekly_classes_data');
+  // ==========================================
+
+  // --- HYBRID STEP 1: LOAD FROM LOCAL STORAGE IMMEDIATELY ---
+  let localData = JSON.parse(localStorage.getItem('weekly_classes_hybrid')) || { classes: [], presets: [] };
+  let classes = localData.classes || [];
+  let presets = localData.presets || [];
+  let currentView = 'all';
+
+  // Render the local data instantly so the screen is never blank
+  renderApp();
+
+  // --- HYBRID STEP 2: REAL-TIME CLOUD SYNC ---
+  let isFirstLoad = true;
+  dbRef.on('value', (snapshot) => {
+    const cloudData = snapshot.val();
+    
+    if (cloudData) {
+      // Data exists in the cloud. We apply the empty-array fix and override local data.
+      classes = (cloudData.classes || []).map(cls => ({
+        ...cls,
+        plans: (cls.plans || []).map(plan => ({
+          ...plan,
+          activities: plan.activities || []
+        }))
+      }));
+      presets = cloudData.presets || [];
+      
+      // Update local storage with the new truth from the cloud
+      localStorage.setItem('weekly_classes_hybrid', JSON.stringify({ classes, presets }));
+      renderApp();
+
+    } else if (isFirstLoad && (classes.length > 0 || presets.length > 0)) {
+      // SMART SYNC: The cloud is totally empty, but we have local data. 
+      // Let's protect our local data by uploading it to Firebase automatically.
+      saveData();
+    } else {
+      // Both cloud and local are empty, or user intentionally deleted everything.
+      classes = [];
+      presets = [];
+      localStorage.setItem('weekly_classes_hybrid', JSON.stringify({ classes, presets }));
+      renderApp();
+    }
+    
+    isFirstLoad = false;
+  });
+
+  // --- HYBRID STEP 3: DUAL SAVE FUNCTION ---
+  function saveData() {
+    const dataObj = { classes, presets };
+    
+    // 1. Save locally instantly for offline reliability
+    localStorage.setItem('weekly_classes_hybrid', JSON.stringify(dataObj));
+    
+    // 2. Push to Firebase cloud for sync
+    dbRef.set(dataObj);
+  }
+
+  // --- HYBRID STEP 4: RESTORED IMPORT / EXPORT ---
+  function exportData() {
+    const dataToExport = { classes, presets };
+    const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: "application/json" });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `weekly_classes_backup_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+  }
+
+  function importData(event) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const importedData = JSON.parse(e.target.result);
+        classes = importedData.classes || [];
+        presets = importedData.presets || [];
+        
+        // This will save the imported file BOTH locally and up to Firebase automatically!
+        saveData(); 
+        renderApp();
+        alert("Import successful! Data synchronized to cloud.");
+      } catch (err) {
+        alert("Invalid file format.");
+      }
+    };
+    if (event.target.files[0]) reader.readAsText(event.target.files[0]);
+  }
+
+  // --- HELPER LOGIC ---
+  function generateId() { return Date.now().toString() + Math.random().toString(36).substr(2, 5); }
+
+  function isPlanHistory(dateString) {
+    const now = new Date();
+    const logicalToday = new Date(now.getTime() - (3 * 60 * 60 * 1000));
+    logicalToday.setHours(0, 0, 0, 0);
+    const planDate = new Date(dateString + "T00:00:00");
+    return planDate < logicalToday;
+  }
+
+  function getNextPlanDate(cls) {
+    const dayMap = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    if (cls.plans.length > 0) {
+      const latestDateStr = cls.plans.reduce((latest, plan) => plan.date > latest ? plan.date : latest, cls.plans[0].date);
+      let d = new Date(latestDateStr + "T00:00:00"); d.setDate(d.getDate() + 7);
+      return d.toISOString().split('T')[0];
+    } else {
+      let d = new Date(); if (d.getHours() < 3) d.setDate(d.getDate() - 1);
+      let currentDay = d.getDay(); let targetDay = dayMap.indexOf(cls.day);
+      let daysUntil = (targetDay - currentDay + 7) % 7; d.setDate(d.getDate() + daysUntil);
+      return d.toISOString().split('T')[0];
+    }
+  }
+
+  // --- CRUD ACTIONS ---
+  function addClass() {
+    const type = document.getElementById('new-class-type').value;
+    const name = document.getElementById('new-class-name').value.trim();
+    const day = document.getElementById('new-class-day').value;
+    const time = document.getElementById('new-class-time').value;
+    if (!name || !time) return alert('Please provide name and time.');
+    classes.push({ id: generateId(), type, name, day, time, plans: [] });
+    saveData(); document.getElementById('class-dialog').close();
+  }
+
+  function deleteClass(classId) {
+    if(confirm("⚠️ Delete this class?")) {
+      if(confirm("This will delete all plans and activities. REALLY sure?")) {
+        if(confirm("Last chance! Delete class permanently?")) {
+          classes = classes.filter(c => c.id !== classId); saveData();
+        }
+      }
+    }
+  }
+
+  function addPlan(classId) {
+    const cls = classes.find(c => c.id === classId);
+    cls.plans.push({ id: generateId(), date: getNextPlanDate(cls), activities: [] });
+    saveData();
+  }
+
+  function deletePlan(classId, planId) {
+    if (confirm("✖ Delete this plan?")) {
+      const cls = classes.find(c => c.id === classId);
+      cls.plans = cls.plans.filter(p => p.id !== planId); saveData();
+    }
+  }
+
+  function saveDetails(classId) {
+    const cls = classes.find(c => c.id === classId);
+    cls.name = document.getElementById(`edit-name-${classId}`).value;
+    cls.day = document.getElementById(`edit-day-${classId}`).value;
+    cls.time = document.getElementById(`edit-time-${classId}`).value;
+    cls.type = document.getElementById(`edit-type-${classId}`).value;
+    saveData();
+  }
+
+  function openPresetDialog(presetId = null) {
+    const dialog = document.getElementById('preset-dialog');
+    document.getElementById('preset-dialog-title').innerText = presetId ? "Edit Preset" : "Add Preset";
+    document.getElementById('preset-id').value = presetId || "";
+    if (presetId) {
+      const p = presets.find(x => x.id === presetId);
+      document.getElementById('preset-name').value = p.name;
+      document.getElementById('preset-duration').value = p.duration;
+      document.getElementById('preset-details').value = p.details;
+    } else {
+      document.getElementById('preset-name').value = ""; document.getElementById('preset-duration').value = ""; document.getElementById('preset-details').value = "";
+    }
+    dialog.showModal();
+  }
+
+  function savePreset() {
+    const id = document.getElementById('preset-id').value;
+    const name = document.getElementById('preset-name').value.trim();
+    const duration = document.getElementById('preset-duration').value;
+    const details = document.getElementById('preset-details').value;
+    if (!name || !duration) return alert("Name and duration required.");
+    if (id) {
+      const p = presets.find(x => x.id === id); p.name = name; p.duration = parseInt(duration); p.details = details;
+    } else {
+      presets.push({ id: generateId(), name, duration: parseInt(duration), details });
+    }
+    saveData(); document.getElementById('preset-dialog').close();
+  }
+
+  function deletePreset(id) { if(confirm("Delete this preset?")) { presets = presets.filter(p => p.id !== id); saveData(); } }
+
+  function openAddActDialog(classId, planId) {
+    document.getElementById('add-act-class-id').value = classId; document.getElementById('add-act-plan-id').value = planId;
+    document.getElementById('add-act-name').value = ""; document.getElementById('add-act-duration').value = ""; document.getElementById('add-act-details').value = "";
+    const select = document.getElementById('add-act-preset-select');
+    select.innerHTML = presets.length > 0 ? presets.map(p => `<option value="${p.id}">${p.name} (${p.duration}m)</option>`).join('') : `<option value="">-- No presets created --</option>`;
+    document.querySelector('input[name="actSource"][value="new"]').checked = true; toggleAddActMode();
+    document.getElementById('add-act-dialog').showModal();
+  }
+
+  function toggleAddActMode() {
+    const isNew = document.querySelector('input[name="actSource"]:checked').value === 'new';
+    document.getElementById('act-new-fields').style.display = isNew ? 'block' : 'none';
+    document.getElementById('act-preset-fields').style.display = isNew ? 'none' : 'block';
+  }
+
+  function saveNewActivity() {
+    const classId = document.getElementById('add-act-class-id').value;
+    const planId = document.getElementById('add-act-plan-id').value;
+    const cls = classes.find(c => c.id === classId);
+    const plan = cls.plans.find(p => p.id === planId);
+    const isNew = document.querySelector('input[name="actSource"]:checked').value === 'new';
+    
+    if (isNew) {
+      const name = document.getElementById('add-act-name').value.trim(); const duration = document.getElementById('add-act-duration').value; const details = document.getElementById('add-act-details').value;
+      if (!name || !duration) return alert("Name and duration required.");
+      plan.activities.push({ id: generateId(), text: name, duration: parseInt(duration), details: details, isDone: false });
+    } else {
+      const presetId = document.getElementById('add-act-preset-select').value;
+      if (!presetId) return alert("No preset selected.");
+      const preset = presets.find(p => p.id === presetId);
+      plan.activities.push({ id: generateId(), text: preset.name, duration: preset.duration, details: preset.details, isDone: false });
+    }
+    saveData(); document.getElementById('add-act-dialog').close();
+  }
+
+  function openEditActDialog(classId, planId, actId) {
+    const cls = classes.find(c => c.id === classId); const plan = cls.plans.find(p => p.id === planId); const act = plan.activities.find(a => a.id === actId);
+    document.getElementById('edit-act-class-id').value = classId; document.getElementById('edit-act-plan-id').value = planId; document.getElementById('edit-act-id').value = actId;
+    document.getElementById('edit-act-name').value = act.text; document.getElementById('edit-act-duration').value = act.duration; document.getElementById('edit-act-details').value = act.details || "";
+    document.getElementById('edit-act-dialog').showModal();
+  }
+
+  function saveEditedActivity() {
+    const classId = document.getElementById('edit-act-class-id').value; const planId = document.getElementById('edit-act-plan-id').value; const actId = document.getElementById('edit-act-id').value;
+    const cls = classes.find(c => c.id === classId); const plan = cls.plans.find(p => p.id === planId); const act = plan.activities.find(a => a.id === actId);
+    const newText = document.getElementById('edit-act-name').value.trim(); const newDuration = document.getElementById('edit-act-duration').value; const newDetails = document.getElementById('edit-act-details').value;
+    if (!newText || !newDuration) return alert("Name and duration required.");
+    act.text = newText; act.duration = parseInt(newDuration); act.details = newDetails;
+    saveData(); document.getElementById('edit-act-dialog').close();
+  }
+
+  function deleteActivity(classId, planId, activityId) {
+    if (confirm("✕ Remove activity?")) {
+      const cls = classes.find(c => c.id === classId); const plan = cls.plans.find(p => p.id === planId);
+      plan.activities = plan.activities.filter(a => a.id !== activityId); saveData();
+    }
+  }
+
+  function toggleActivity(classId, planId, activityId) {
+    const cls = classes.find(c => c.id === classId); const plan = cls.plans.find(p => p.id === planId); const activity = plan.activities.find(a => a.id === activityId);
+    activity.isDone = !activity.isDone; saveData();
+  }
+
+  function toggleDetails(elementId) {
+    const el = document.getElementById(elementId); el.style.display = el.style.display === 'block' ? 'none' : 'block';
+  }
+
+  function setView(viewMode) {
+    currentView = viewMode;
+    document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active')); event.target.classList.add('active');
+    if (viewMode === 'presets') {
+      document.getElementById('main-view').style.display = 'none'; document.getElementById('presets-view').style.display = 'block'; document.getElementById('main-fab').style.display = 'none';
+    } else {
+      document.getElementById('main-view').style.display = 'block'; document.getElementById('presets-view').style.display = 'none'; document.getElementById('main-fab').style.display = 'flex';
+      document.getElementById('individualPicker').style.display = (viewMode === 'individual') ? 'flex' : 'none'; document.getElementById('dayPicker').style.display = (viewMode === 'day') ? 'flex' : 'none';
+    }
+    renderApp();
+  }
+
+  function getFilteredClasses() {
+    let filtered = [...classes];
+    if (currentView === 'school') filtered = filtered.filter(c => c.type === 'school');
+    if (currentView === 'home') filtered = filtered.filter(c => c.type === 'home');
+    if (currentView === 'individual') { const selId = document.getElementById('individualClassSelect').value; if (selId) filtered = filtered.filter(c => c.id === selId); }
+    if (currentView === 'day') { const selDay = document.getElementById('daySelect').value; filtered = filtered.filter(c => c.day === selDay); }
+    if (currentView === 'weekorder') {
+      const dayMap = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+      filtered.sort((a,b) => { let dayA = dayMap.indexOf(a.day); let dayB = dayMap.indexOf(b.day); if (dayA !== dayB) return dayA - dayB; return a.time.localeCompare(b.time); });
+    }
+    return filtered;
+  }
+
+  function renderApp() {
+    if (currentView === 'presets') { renderPresets(); return; }
+    const indSelect = document.getElementById('individualClassSelect'); const currentSelId = indSelect.value;
+    indSelect.innerHTML = classes.map(c => `<option value="${c.id}">${c.name} (${c.day})</option>`).join('');
+    if (currentSelId && classes.some(c => c.id === currentSelId)) indSelect.value = currentSelId;
+
+    const filteredClasses = getFilteredClasses();
+    const currentContainer = document.getElementById('current-classes'); const historyContainer = document.getElementById('history-content');
+    currentContainer.innerHTML = ''; historyContainer.innerHTML = '';
+    if (filteredClasses.length === 0) currentContainer.innerHTML = "<p style='text-align:center; color:#8e8e93; margin-top:2rem;'>No classes to display.</p>";
+
+    filteredClasses.forEach(cls => {
+      const currentPlans = cls.plans.filter(p => !isPlanHistory(p.date)); const historyPlans = cls.plans.filter(p => isPlanHistory(p.date));
+      currentContainer.innerHTML += generateClassHTML(cls, currentPlans, false);
+      if (historyPlans.length > 0) historyContainer.innerHTML += generateClassHTML(cls, historyPlans, true);
+    });
+  }
+
+  function renderPresets() {
+    const container = document.getElementById('presets-container');
+    if (presets.length === 0) { container.innerHTML = "<p style='text-align:center; color:#8e8e93;'>No presets yet.</p>"; return; }
+    container.innerHTML = presets.map(p => `
+      <div class="class-card">
+        <div class="class-header">
+          <div class="class-title"><span>${p.name}</span> <span class="badge school">${p.duration} min</span></div>
+          <div><button class="small" onclick="openPresetDialog('${p.id}')">✎ edit</button><button class="small danger" onclick="deletePreset('${p.id}')">🗑 delete</button></div>
+        </div>
+        ${p.details ? `<div style="margin-top:10px; font-size:0.9rem; color:#555; white-space:pre-wrap;">${p.details}</div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  function generateClassHTML(cls, plansToRender, isHistory) {
+    if (isHistory && plansToRender.length === 0) return '';
+    const isHome = cls.type === 'home';
+    let plansHTML = plansToRender.map(plan => `
+      <div class="plan-block">
+        <div class="plan-header">
+          <span>📅 ${plan.date} ${isHistory ? `<span class="badge" style="background:#b9d1e9; color:#2c3e50; margin-left:5px;">Archived</span>` : ''}</span>
+          <div>
+            <button class="delete-plan-btn small" onclick="deletePlan('${cls.id}', '${plan.id}')">✖ del plan</button>
+            <button class="small" onclick="openAddActDialog('${cls.id}', '${plan.id}')">+ act</button>
+          </div>
+        </div>
+        <div class="activity-list">
+          ${plan.activities.map(act => `
+            <div class="activity-item" data-class-id="${cls.id}" data-plan-id="${plan.id}" data-act-id="${act.id}" draggable="true" ondragstart="dragStart(event, '${cls.id}', '${plan.id}', '${act.id}')" ondragover="dragOver(event)" ondrop="drop(event, '${cls.id}', '${plan.id}', '${act.id}')">
+              <div class="activity-main">
+                <span class="drag-handle" ontouchstart="touchStart(event, '${cls.id}', '${plan.id}', '${act.id}')">☰</span>
+                <input type="checkbox" ${act.isDone ? 'checked' : ''} onchange="toggleActivity('${cls.id}', '${plan.id}', '${act.id}')">
+                <span class="activity-text">${act.text}</span>
+                <span class="minutes-badge">${act.duration} min</span>
+                ${act.details ? `<button class="small" onclick="toggleDetails('det-${act.id}')">⌄</button>` : ''}
+                <button class="small" onclick="openEditActDialog('${cls.id}', '${plan.id}', '${act.id}')">✎</button>
+                <button class="small danger" onclick="deleteActivity('${cls.id}', '${plan.id}', '${act.id}')">✕</button>
+              </div>
+              ${act.details ? `<div id="det-${act.id}" class="activity-details">${act.details}</div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+
+    return `
+      <div class="class-card ${isHome ? 'home-class' : ''}">
+        <div class="class-header">
+          <div class="class-title"><span>${cls.name}</span><span class="badge ${cls.type}">${cls.type}</span></div>
+          ${!isHistory ? `<button class="small warning" onclick="deleteClass('${cls.id}')">🗑 delete</button>` : ''}
+        </div>
+        <div class="meta">${cls.day} · ${cls.time}</div>
+        <div class="plans-area">${plansHTML || (!isHistory ? `<p style="font-size:0.9rem; color:#888;">(No plans scheduled)</p>` : '')}</div>
+        ${!isHistory ? `<button class="small primary" style="width:100%; margin-top:0.5rem;" onclick="addPlan('${cls.id}')">➕ add class plan</button>
+        <details>
+          <summary class="clickable-line">👆 Click to edit class details</summary>
+          <div class="edit-panel">
+            <label>Name: <input type="text" id="edit-name-${cls.id}" value="${cls.name}"></label>
+            <label>Day: <select id="edit-day-${cls.id}">${["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"].map(d => `<option value="${d}" ${d===cls.day?'selected':''}>${d}</option>`).join('')}</select></label>
+            <label>Time: <input type="time" id="edit-time-${cls.id}" value="${cls.time}"></label>
+            <label>Type: <select id="edit-type-${cls.id}"><option value="school" ${cls.type==='school'?'selected':''}>School</option><option value="home" ${cls.type==='home'?'selected':''}>Home</option></select></label>
+            <button class="primary small" style="margin-top:10px;" onclick="saveDetails('${cls.id}')">Save Changes</button>
+          </div>
+        </details>` : ''}
+      </div>
+    `;
+  }
+
+  function reorderActivity(classId, planId, draggedActId, targetActId) {
+    const cls = classes.find(c => c.id === classId); const plan = cls.plans.find(p => p.id === planId);
+    const oldIndex = plan.activities.findIndex(a => a.id === draggedActId); const newIndex = plan.activities.findIndex(a => a.id === targetActId);
+    const [removed] = plan.activities.splice(oldIndex, 1); plan.activities.splice(newIndex, 0, removed);
+    saveData();
+  }
+
+  function dragStart(e, classId, planId, actId) {
+    e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', JSON.stringify({classId, planId, actId}));
+    const det = document.getElementById(`det-${actId}`); if (det) det.style.display = 'none';
+    setTimeout(() => e.target.style.opacity = '0.4', 0);
+  }
+  function dragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+  function drop(e, targetClassId, targetPlanId, targetActId) {
+    e.preventDefault(); e.target.closest('.activity-item').style.opacity = '1';
+    const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+    if (data.classId === targetClassId && data.planId === targetPlanId && data.actId !== targetActId) reorderActivity(data.classId, data.planId, data.actId, targetActId);
+  }
+
+  let touchData = null;
+  function touchStart(e, classId, planId, actId) {
+    const targetItem = e.target.closest('.activity-item'); if (!targetItem) return;
+    const det = document.getElementById(`det-${actId}`); if (det) det.style.display = 'none';
+    touchData = { classId, planId, actId, targetItem, clone: targetItem.cloneNode(true), offsetX: e.touches[0].clientX - targetItem.getBoundingClientRect().left, offsetY: e.touches[0].clientY - targetItem.getBoundingClientRect().top };
+    touchData.clone.style.position = 'fixed'; touchData.clone.style.width = targetItem.offsetWidth + 'px'; touchData.clone.style.zIndex = '9999'; touchData.clone.style.opacity = '0.9'; touchData.clone.style.pointerEvents = 'none'; touchData.clone.style.boxShadow = '0 5px 15px rgba(0,0,0,0.2)'; touchData.clone.style.left = targetItem.getBoundingClientRect().left + 'px'; touchData.clone.style.top = targetItem.getBoundingClientRect().top + 'px';
+    document.body.appendChild(touchData.clone); targetItem.style.opacity = '0.3';
+    document.addEventListener('touchmove', touchMove, { passive: false }); document.addEventListener('touchend', touchEnd);
+  }
+  function touchMove(e) { if (!touchData) return; e.preventDefault(); const touch = e.touches[0]; touchData.clone.style.top = (touch.clientY - touchData.offsetY) + 'px'; touchData.clone.style.left = (touch.clientX - touchData.offsetX) + 'px'; }
+  function touchEnd(e) {
+    if (!touchData) return; const touch = e.changedTouches[0]; touchData.clone.remove(); touchData.targetItem.style.opacity = '1';
+    document.removeEventListener('touchmove', touchMove); document.removeEventListener('touchend', touchEnd);
+    const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY); const dropItem = dropTarget ? dropTarget.closest('.activity-item') : null;
+    if (dropItem && dropItem !== touchData.targetItem) {
+        const targetActId = dropItem.getAttribute('data-act-id'); const targetPlanId = dropItem.getAttribute('data-plan-id'); const targetClassId = dropItem.getAttribute('data-class-id');
+        if (targetPlanId === touchData.planId && targetClassId === touchData.classId) reorderActivity(touchData.classId, touchData.planId, touchData.actId, targetActId);
+    }
+    touchData = null;
+  }
+</script>
+</body>
+</html>
