@@ -41,7 +41,6 @@
     
     .plan-block { background: #f8fcff; border-radius: 18px; padding: 0.9rem; margin: 0.9rem 0; border: 1px solid #d4e0ec; }
     .plan-header { font-weight: 600; font-size: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 0.5rem; gap: 5px; }
-    .plan-actions { display: flex; gap: 5px; flex-wrap: wrap; }
     .delete-plan-btn { background: #f1b6b6; color: #9b1c1c; border: none; }
     
     .activity-list { display: flex; flex-direction: column; gap: 4px; }
@@ -129,12 +128,6 @@
     <button class="primary" style="width: 100%; margin-bottom: 15px;" onclick="openPresetDialog()">+ Add New Preset</button>
     <div id="presets-container"></div>
   </div>
-
-  <div class="import-export">
-    <button onclick="document.getElementById('import-file').click()">📤 Import</button>
-    <button onclick="exportData()">📥 Export</button>
-    <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importData(event)">
-  </div>
 </div>
 
 <button class="fab" id="main-fab" onclick="document.getElementById('class-dialog').showModal()">+</button>
@@ -211,11 +204,13 @@
 
 <script>
   // ==========================================
-  // FIREBASE CONFIGURATION 
+  // FIREBASE CONFIGURATION (Filled from your screenshot)
   // ==========================================
   const firebaseConfig = {
     apiKey: "AIzaSyCbGkc6D2CNYLib1j2VfZMj_Ac-iS0K4zk",
     authDomain: "weeklyclassesapp.firebaseapp.com",
+    // This is the standard pattern for RTDB URLs based on your project ID.
+    // If this doesn't work, check the "Realtime Database" tab in the console.
     databaseURL: "https://weeklyclassesapp-default-rtdb.firebaseio.com", 
     projectId: "weeklyclassesapp",
     storageBucket: "weeklyclassesapp.firebasestorage.app",
@@ -223,90 +218,41 @@
     appId: "1:370576800213:web:37575ef143a03ce292655c"
   };
 
+  // Initialize Firebase
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
   const dbRef = db.ref('weekly_classes_data');
   // ==========================================
 
-  // --- HYBRID STEP 1: LOAD FROM LOCAL STORAGE IMMEDIATELY ---
-  let localData = JSON.parse(localStorage.getItem('weekly_classes_hybrid')) || { classes: [], presets: [] };
-  let classes = localData.classes || [];
-  let presets = localData.presets || [];
+  let classes = [];
+  let presets = [];
   let currentView = 'all';
 
-  // Render the local data instantly so the screen is never blank
-  renderApp();
-
-  // --- HYBRID STEP 2: REAL-TIME CLOUD SYNC ---
-  let isFirstLoad = true;
+  // --- REAL-TIME SYNC LISTENER ---
+  // This listens for any changes in the database and updates the screen instantly
   dbRef.on('value', (snapshot) => {
-    const cloudData = snapshot.val();
-    
-    if (cloudData) {
-      // Data exists in the cloud. We apply the empty-array fix and override local data.
-      classes = (cloudData.classes || []).map(cls => ({
+    const data = snapshot.val();
+    if (data) {
+      // Firebase removes empty arrays to save space. We must add them back when reading the data!
+      classes = (data.classes || []).map(cls => ({
         ...cls,
         plans: (cls.plans || []).map(plan => ({
           ...plan,
           activities: plan.activities || []
         }))
       }));
-      presets = cloudData.presets || [];
-      
-      // Update local storage with the new truth from the cloud
-      localStorage.setItem('weekly_classes_hybrid', JSON.stringify({ classes, presets }));
-      renderApp();
-
-    } else if (isFirstLoad && (classes.length > 0 || presets.length > 0)) {
-      // SMART SYNC: The cloud is totally empty, but we have local data. 
-      // Let's protect our local data by uploading it to Firebase automatically.
-      saveData();
+      presets = data.presets || [];
     } else {
-      // Both cloud and local are empty, or user intentionally deleted everything.
       classes = [];
       presets = [];
-      localStorage.setItem('weekly_classes_hybrid', JSON.stringify({ classes, presets }));
-      renderApp();
     }
-    
-    isFirstLoad = false;
+    renderApp();
   });
-
-  // --- HYBRID STEP 3: DUAL SAVE FUNCTION ---
+  // --- SAVE FUNCTION (Pushes to Cloud instead of Local) ---
   function saveData() {
-    const dataObj = { classes, presets };
-    localStorage.setItem('weekly_classes_hybrid', JSON.stringify(dataObj));
-    dbRef.set(dataObj);
+    dbRef.set({ classes, presets });
   }
 
-  // --- HYBRID STEP 4: RESTORED IMPORT / EXPORT ---
-  function exportData() {
-    const dataToExport = { classes, presets };
-    const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: "application/json" });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `weekly_classes_backup_${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-  }
-
-  function importData(event) {
-    const reader = new FileReader();
-    reader.onload = e => {
-      try {
-        const importedData = JSON.parse(e.target.result);
-        classes = importedData.classes || [];
-        presets = importedData.presets || [];
-        saveData(); 
-        renderApp();
-        alert("Import successful! Data synchronized to cloud.");
-      } catch (err) {
-        alert("Invalid file format.");
-      }
-    };
-    if (event.target.files[0]) reader.readAsText(event.target.files[0]);
-  }
-
-  // --- HELPER LOGIC ---
   function generateId() { return Date.now().toString() + Math.random().toString(36).substr(2, 5); }
 
   function isPlanHistory(dateString) {
@@ -331,44 +277,6 @@
     }
   }
 
-  // --- COPY / PASTE LOGIC ---
-  function copyPlan(classId, planId) {
-    const cls = classes.find(c => c.id === classId);
-    const plan = cls.plans.find(p => p.id === planId);
-    if (plan.activities.length === 0) {
-      return alert("This plan has no activities to copy.");
-    }
-    // Save to local clipboard
-    localStorage.setItem('weekly_classes_clipboard', JSON.stringify(plan.activities));
-    alert(plan.activities.length + " activities copied to clipboard!");
-  }
-
-  function pastePlan(classId, planId) {
-    const clipboardData = localStorage.getItem('weekly_classes_clipboard');
-    if (!clipboardData) {
-      return alert("Clipboard is empty! Copy a plan first.");
-    }
-    
-    const activitiesToPaste = JSON.parse(clipboardData);
-    const cls = classes.find(c => c.id === classId);
-    const plan = cls.plans.find(p => p.id === planId);
-    
-    // Add each activity with a NEW generated ID and uncheck the 'done' box
-    activitiesToPaste.forEach(act => {
-      plan.activities.push({
-        id: generateId(),
-        text: act.text,
-        duration: act.duration,
-        details: act.details || "",
-        isDone: false // Fresh start for the new plan!
-      });
-    });
-    
-    saveData();
-    renderApp();
-  }
-
-  // --- CRUD ACTIONS ---
   function addClass() {
     const type = document.getElementById('new-class-type').value;
     const name = document.getElementById('new-class-name').value.trim();
@@ -573,9 +481,7 @@
       <div class="plan-block">
         <div class="plan-header">
           <span>📅 ${plan.date} ${isHistory ? `<span class="badge" style="background:#b9d1e9; color:#2c3e50; margin-left:5px;">Archived</span>` : ''}</span>
-          <div class="plan-actions">
-            <button class="small" onclick="copyPlan('${cls.id}', '${plan.id}')" title="Copy activities">📄 copy</button>
-            <button class="small" onclick="pastePlan('${cls.id}', '${plan.id}')" title="Paste activities">📋 paste</button>
+          <div>
             <button class="delete-plan-btn small" onclick="deletePlan('${cls.id}', '${plan.id}')">✖ del plan</button>
             <button class="small" onclick="openAddActDialog('${cls.id}', '${plan.id}')">+ act</button>
           </div>

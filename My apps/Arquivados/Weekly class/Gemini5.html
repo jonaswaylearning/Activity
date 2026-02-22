@@ -41,7 +41,6 @@
     
     .plan-block { background: #f8fcff; border-radius: 18px; padding: 0.9rem; margin: 0.9rem 0; border: 1px solid #d4e0ec; }
     .plan-header { font-weight: 600; font-size: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 0.5rem; gap: 5px; }
-    .plan-actions { display: flex; gap: 5px; flex-wrap: wrap; }
     .delete-plan-btn { background: #f1b6b6; color: #9b1c1c; border: none; }
     
     .activity-list { display: flex; flex-direction: column; gap: 4px; }
@@ -275,7 +274,11 @@
   // --- HYBRID STEP 3: DUAL SAVE FUNCTION ---
   function saveData() {
     const dataObj = { classes, presets };
+    
+    // 1. Save locally instantly for offline reliability
     localStorage.setItem('weekly_classes_hybrid', JSON.stringify(dataObj));
+    
+    // 2. Push to Firebase cloud for sync
     dbRef.set(dataObj);
   }
 
@@ -296,6 +299,8 @@
         const importedData = JSON.parse(e.target.result);
         classes = importedData.classes || [];
         presets = importedData.presets || [];
+        
+        // This will save the imported file BOTH locally and up to Firebase automatically!
         saveData(); 
         renderApp();
         alert("Import successful! Data synchronized to cloud.");
@@ -329,43 +334,6 @@
       let daysUntil = (targetDay - currentDay + 7) % 7; d.setDate(d.getDate() + daysUntil);
       return d.toISOString().split('T')[0];
     }
-  }
-
-  // --- COPY / PASTE LOGIC ---
-  function copyPlan(classId, planId) {
-    const cls = classes.find(c => c.id === classId);
-    const plan = cls.plans.find(p => p.id === planId);
-    if (plan.activities.length === 0) {
-      return alert("This plan has no activities to copy.");
-    }
-    // Save to local clipboard
-    localStorage.setItem('weekly_classes_clipboard', JSON.stringify(plan.activities));
-    alert(plan.activities.length + " activities copied to clipboard!");
-  }
-
-  function pastePlan(classId, planId) {
-    const clipboardData = localStorage.getItem('weekly_classes_clipboard');
-    if (!clipboardData) {
-      return alert("Clipboard is empty! Copy a plan first.");
-    }
-    
-    const activitiesToPaste = JSON.parse(clipboardData);
-    const cls = classes.find(c => c.id === classId);
-    const plan = cls.plans.find(p => p.id === planId);
-    
-    // Add each activity with a NEW generated ID and uncheck the 'done' box
-    activitiesToPaste.forEach(act => {
-      plan.activities.push({
-        id: generateId(),
-        text: act.text,
-        duration: act.duration,
-        details: act.details || "",
-        isDone: false // Fresh start for the new plan!
-      });
-    });
-    
-    saveData();
-    renderApp();
   }
 
   // --- CRUD ACTIONS ---
@@ -573,9 +541,7 @@
       <div class="plan-block">
         <div class="plan-header">
           <span>📅 ${plan.date} ${isHistory ? `<span class="badge" style="background:#b9d1e9; color:#2c3e50; margin-left:5px;">Archived</span>` : ''}</span>
-          <div class="plan-actions">
-            <button class="small" onclick="copyPlan('${cls.id}', '${plan.id}')" title="Copy activities">📄 copy</button>
-            <button class="small" onclick="pastePlan('${cls.id}', '${plan.id}')" title="Paste activities">📋 paste</button>
+          <div>
             <button class="delete-plan-btn small" onclick="deletePlan('${cls.id}', '${plan.id}')">✖ del plan</button>
             <button class="small" onclick="openAddActDialog('${cls.id}', '${plan.id}')">+ act</button>
           </div>
